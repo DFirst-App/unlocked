@@ -161,6 +161,11 @@ const BOT_FEATURES = {
   'russianodds': ['5-Tick Analysis', 'Quick Recovery', 'Pattern Trading']
 };
 
+const SPECIAL_MARTINGALE = {
+  HIGH: ['DIFFERbot', 'metrodiffer'],
+  SAFE: ['safeoverbot', 'safeunderbot']
+} as const;
+
 const BOT_RATINGS = {
   'DIFFERbot': 4.5,
   'notouchbot': 4.6,
@@ -183,6 +188,16 @@ const DERIV_WS_URL = `wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`;
 const BOT_RUNNING_KEY = '@bot_running_state';
 const DISCLAIMER_SHOWN_KEY = '@disclaimer_shown';
 
+const getDefaultMartingale = (botType?: string) => {
+  if (SPECIAL_MARTINGALE.SAFE.includes(botType || '')) {
+    return '3.5';
+  }
+  if (SPECIAL_MARTINGALE.HIGH.includes(botType || '')) {
+    return '15';
+  }
+  return '2.1';
+};
+
 function BotScreen() {
   const { bot } = useLocalSearchParams();
   const [isRunning, setIsRunning] = useState(false);
@@ -190,7 +205,7 @@ function BotScreen() {
     initialStake: bot === 'smartvolatility' ? '1' : '0.35',
     takeProfit: '0',  // Will be updated when balance is confirmed
     stopLoss: '1000',
-    martingaleMultiplier: ['safeoverbot', 'safeunderbot', 'DIFFERbot', 'metrodiffer'].includes(bot as string) ? '15' : '2.1'
+    martingaleMultiplier: getDefaultMartingale(bot as string)
   });
   const [stats, setStats] = useState<BotStats>({
     currentStake: 0,
@@ -563,6 +578,28 @@ function BotScreen() {
         console.log('[Bot] Using API key authentication');
         authToken = savedKey;
       }
+
+      // Ensure no previous WebSocket/bot instance is running before starting a new one
+      if (ws?.botInstance) {
+        console.log('[Bot] Cleaning previous bot instance before new start:', ws.botInstance.constructor.name);
+        try {
+          ws.botInstance.stop();
+        } catch (error) {
+          console.error('[Bot] Error stopping previous bot instance:', error);
+        }
+        ws.botInstance = null;
+      }
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try {
+          console.log('[Bot] Closing previous WebSocket connection before new start');
+          ws.send(JSON.stringify({ forget_all: ['ticks', 'proposal', 'proposal_open_contract', 'balance'] }));
+          await new Promise(resolve => setTimeout(resolve, 500));
+          ws.close();
+        } catch (error) {
+          console.error('[Bot] Error closing previous WebSocket:', error);
+        }
+      }
+      setWs(null);
 
       const wsInstance = new WebSocket(DERIV_WS_URL) as BotWebSocket;
       console.log('[Bot] Initializing WebSocket connection...');
