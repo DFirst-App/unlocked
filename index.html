@@ -14,7 +14,8 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         body {
@@ -24,7 +25,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
             color: #1a1a1a;
             height: 100vh;
         }
@@ -36,8 +37,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            height: 100%;
-            max-height: 100vh;
+            gap: 12px;
         }
 
         .logo-container {
@@ -69,7 +69,7 @@
 
         .features {
             list-style: none;
-            margin-bottom: 28px;
+            margin-bottom: 18px;
             text-align: left;
             display: inline-block;
             background: #FFFFFF;
@@ -148,10 +148,10 @@
 
         .store-buttons {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .store-button {
@@ -264,7 +264,7 @@
         }
 
         .footer {
-            margin-top: 18px;
+            margin-top: 10px;
             padding-top: 0;
             font-size: 13px;
             color: #6B7280;
@@ -280,15 +280,17 @@
         }
 
         .disclaimer {
-            margin-top: 12px;
+            margin-top: 8px;
             padding: 12px 14px;
             border-radius: 10px;
             background: #1E1E1E;
             color: #F3F4F6;
             font-size: 11px;
-            line-height: 1.5;
+            line-height: 1.4;
             text-align: left;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            align-self: stretch;
         }
 
         .disclaimer-title {
@@ -302,11 +304,12 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
-                padding: 15px;
+                padding: 12px;
             }
 
             .container {
                 max-width: 100%;
+                gap: 10px;
             }
 
             .logo-text {
@@ -320,7 +323,7 @@
 
             .features {
                 padding: 16px 20px;
-                margin-bottom: 22px;
+                margin-bottom: 16px;
             }
 
             .feature-item {
@@ -341,7 +344,7 @@
             .store-buttons {
                 flex-direction: column;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
             }
 
             .store-button {
@@ -401,7 +404,7 @@
 
             .store-button {
                 font-size: 10px;
-                padding: 9px 14px;
+                padding: 8px 12px;
             }
 
             .support-button {
@@ -412,16 +415,16 @@
 
         @media (max-height: 700px) {
             .logo-container {
-                margin-bottom: 18px;
+                margin-bottom: 12px;
             }
 
             .subtitle {
-                margin-bottom: 18px;
+                margin-bottom: 14px;
             }
 
             .features {
-                margin-bottom: 18px;
-                padding: 16px 20px;
+                margin-bottom: 14px;
+                padding: 14px 18px;
             }
 
             .feature-item {
@@ -429,11 +432,11 @@
             }
 
             .download-button {
-                margin-bottom: 15px;
+                margin-bottom: 12px;
             }
 
             .store-buttons {
-                margin-bottom: 15px;
+                margin-bottom: 12px;
             }
 
             .support-section {
@@ -443,6 +446,17 @@
 
             .footer {
                 padding-top: 10px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 760px;
+            }
+            .disclaimer {
+                width: calc(100vw - 64px);
+                margin-left: auto;
+                margin-right: auto;
             }
         }
     </style>
