@@ -100,44 +100,27 @@ jobs:
           if [ -f "web-build/app/index.html" ]; then
             echo "Fixing web app index.html paths..."
             
-            # Create Python script to insert base tag
-            cat > /tmp/fix_base_tag.py << 'PYEOF'
-import re
-import sys
-
-try:
-    with open('web-build/app/index.html', 'r', encoding='utf-8') as f:
-        content = f.read()
-    
-    # Add base tag after <head> if it doesn't exist
-    # Use relative path since we're in /app subdirectory of /unlocked
-    if '<base' not in content:
-        # Find <head> tag and insert base tag after it
-        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="./">', content, count=1)
-        print("Added <base href=\"./\"> tag (relative path)")
-    else:
-        print("Base tag already exists")
-    
-    with open('web-build/app/index.html', 'w', encoding='utf-8') as f:
-        f.write(content)
-    
-    print("✅ Successfully fixed web-build/app/index.html")
-except Exception as e:
-    print(f"Error: {e}", file=sys.stderr)
-    sys.exit(1)
-PYEOF
-            
-            # Run Python script
-            python3 /tmp/fix_base_tag.py
+            # Check if base tag already exists
+            if ! grep -q '<base href' web-build/app/index.html; then
+              echo "Adding base tag to web app index.html..."
+              # Use Python one-liner to insert base tag (more reliable than sed)
+              python3 -c "import re; content = open('web-build/app/index.html', 'r', encoding='utf-8').read(); content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href=\"/unlocked/app/\">', content, count=1); open('web-build/app/index.html', 'w', encoding='utf-8').write(content)"
+              echo "✅ Base tag added using Python"
+            else
+              echo "Base tag already exists, updating to absolute path..."
+              # Update existing base tag to use absolute path
+              python3 -c "import re; content = open('web-build/app/index.html', 'r', encoding='utf-8').read(); content = re.sub(r'<base href=[^>]*>', '<base href=\"/unlocked/app/\">', content); open('web-build/app/index.html', 'w', encoding='utf-8').write(content)"
+              echo "✅ Base tag updated to absolute path"
+            fi
             
             # Verify base tag was added
-            if ! grep -q '<base href' web-build/app/index.html; then
-              echo "Warning: Base tag might not have been added correctly"
-              echo "First 20 lines of index.html:"
-              head -20 web-build/app/index.html || true
-            else
+            if grep -q '<base href' web-build/app/index.html; then
               echo "✅ Base tag confirmed in index.html"
               grep '<base' web-build/app/index.html || true
+            else
+              echo "❌ Base tag NOT found after all attempts!"
+              echo "First 20 lines of index.html:"
+              head -20 web-build/app/index.html || true
             fi
           else
             echo "Error: web-build/app/index.html not found!"
