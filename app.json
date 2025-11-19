@@ -54,7 +54,8 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "baseUrl": "/unlocked/app"
     },
     "experiments": {
       "typedRoutes": true

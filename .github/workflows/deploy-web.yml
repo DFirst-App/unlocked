@@ -61,30 +61,48 @@ jobs:
 
       - name: Build web app
         run: |
-          # Export Expo app to app subdirectory
-          npx expo export --platform web --output-dir web-build/app
+          # Export Expo app to root first (Expo expects this)
+          # Set base path for Expo Router
+          export EXPO_PUBLIC_BASE_PATH=/unlocked/app
+          npx expo export --platform web --output-dir web-build-temp
+        env:
+          EXPO_PUBLIC_BASE_PATH: /unlocked/app
 
-      - name: Setup landing page
+      - name: Setup landing page and web app structure
         run: |
-          # Copy landing page to root (this will be served at /)
+          # Create app subdirectory
+          mkdir -p web-build/app
+          
+          # Move all Expo app files to /app subdirectory
+          if [ -d "web-build-temp" ]; then
+            # Use cp then rm to ensure all files are moved correctly
+            cp -r web-build-temp/* web-build/app/ 2>/dev/null || true
+            cp -r web-build-temp/.* web-build/app/ 2>/dev/null || true
+            # Remove temp directory
+            rm -rf web-build-temp
+          fi
+          
+          # Copy landing page to root
           cp index.html web-build/index.html
           
-      - name: Fix web app asset paths for subdirectory
+          echo "Files moved to web-build/app/:"
+          ls -la web-build/app/ | head -20 || true
+          
+      - name: Fix web app paths for subdirectory
         run: |
-          # Fix asset paths in the web app's index.html to work from /app subdirectory
+          # Fix paths in the web app to work from /app
           if [ -f "web-build/app/index.html" ]; then
-            # Use a more targeted approach - only fix the main index.html
-            # Update script and link tags to use /app prefix
+            # Add base tag to fix all relative paths
+            if ! grep -q '<base' web-build/app/index.html; then
+              # Insert base tag right after <head>
+              sed -i '0,/<head>/s//<head>\n  <base href="\/app\/">/' web-build/app/index.html 2>/dev/null || \
+              sed -i '' '0,/<head>/s//<head>\n  <base href="\/app\/">/' web-build/app/index.html || \
+              perl -i -pe 's|<head>|<head>\n  <base href="/app/">|' web-build/app/index.html
+            fi
+            
+            # Also fix any absolute paths that might exist
             sed -i 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html
             sed -i 's|src="/assets|src="/app/assets|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/assets|src="/app/assets|g' web-build/app/index.html
-            sed -i 's|href="/_expo|href="/app/_expo|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|href="/_expo|href="/app/_expo|g' web-build/app/index.html
-            sed -i 's|href="/assets|href="/app/assets|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|href="/assets|href="/app/assets|g' web-build/app/index.html
-            # Fix base tag if it exists
-            sed -i 's|<base href="/"|<base href="/app/"|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|<base href="/"|<base href="/app/"|g' web-build/app/index.html
-            # Add base tag if it doesn't exist
-            if ! grep -q '<base' web-build/app/index.html; then
-              sed -i 's|<head>|<head>\n  <base href="/app/">|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|<head>|<head>\n  <base href="/app/">|g' web-build/app/index.html
-            fi
           fi
 
       - name: Verify web build output
@@ -94,8 +112,15 @@ jobs:
             ls -la . || true
             exit 1
           fi
-          echo "Contents of web-build:"
+          echo "=== Contents of web-build root ==="
           ls -la web-build/ || true
+          echo ""
+          echo "=== Contents of web-build/app ==="
+          ls -la web-build/app/ || true
+          echo ""
+          echo "=== All index.html files ==="
+          find web-build -name "index.html" -type f || true
+          echo ""
           # Check for landing page at root
           if [ ! -f "web-build/index.html" ]; then
             echo "Error: Landing page index.html not found at web-build/index.html!"
@@ -104,14 +129,17 @@ jobs:
           # Check for web app in app subdirectory
           if [ ! -f "web-build/app/index.html" ]; then
             echo "Error: Web app index.html not found at web-build/app/index.html!"
-            echo "Directory structure:"
-            find web-build -type f -name "index.html" || true
+            echo "Checking what files exist in app directory:"
+            find web-build/app -type f | head -20 || true
             exit 1
           fi
-          echo "Web build verified successfully"
-          echo "Landing page: web-build/index.html"
-          echo "Web app: web-build/app/index.html"
-          echo "Build size: $(du -sh web-build | cut -f1)"
+          echo "✅ Web build verified successfully"
+          echo "Landing page: web-build/index.html ($(du -h web-build/index.html | cut -f1))"
+          echo "Web app: web-build/app/index.html ($(du -h web-build/app/index.html | cut -f1))"
+          echo "Total build size: $(du -sh web-build | cut -f1)"
+          echo ""
+          echo "=== Sample of web app index.html ==="
+          head -30 web-build/app/index.html || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
