@@ -100,8 +100,8 @@ jobs:
           if [ -f "web-build/app/index.html" ]; then
             echo "Fixing web app index.html paths..."
             
-            # Use Python for reliable base tag insertion
-            python3 << 'PYTHON_SCRIPT'
+            # Create Python script to insert base tag
+            cat > /tmp/fix_base_tag.py << 'PYEOF'
 import re
 import sys
 
@@ -113,19 +113,10 @@ try:
     # Use relative path since we're in /app subdirectory of /unlocked
     if '<base' not in content:
         # Find <head> tag and insert base tag after it
-        # Base should be relative to current location: if we're at /unlocked/app/, base should be ./
         content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="./">', content, count=1)
         print("Added <base href=\"./\"> tag (relative path)")
     else:
         print("Base tag already exists")
-    
-    # Don't fix absolute paths - let the base tag handle relative paths
-    # Only fix paths that are explicitly absolute and need to stay absolute
-    original_content = content
-    # Keep relative paths as-is, they'll be resolved by the base tag
-    
-    if content != original_content:
-        print("Fixed absolute paths in index.html")
     
     with open('web-build/app/index.html', 'w', encoding='utf-8') as f:
         f.write(content)
@@ -134,7 +125,10 @@ try:
 except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.exit(1)
-PYTHON_SCRIPT
+PYEOF
+            
+            # Run Python script
+            python3 /tmp/fix_base_tag.py
             
             # Verify base tag was added
             if ! grep -q '<base href' web-build/app/index.html; then
