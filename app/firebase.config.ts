@@ -8,8 +8,10 @@ import {
   onAuthStateChanged,
   User,
   sendPasswordResetEmail,
-  getReactNativePersistence
+  getReactNativePersistence,
+  browserLocalPersistence
 } from 'firebase/auth';
+import { Platform } from 'react-native';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
@@ -24,9 +26,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+
+// Use platform-specific persistence
+let auth;
+if (Platform.OS === 'web') {
+  // On web, use browserLocalPersistence
+  auth = initializeAuth(app, {
+    persistence: browserLocalPersistence
+  });
+} else {
+  // On mobile, use React Native AsyncStorage persistence
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  });
+}
+
 const db = getFirestore(app);
 
 // Email validation helper
