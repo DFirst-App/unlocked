@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
 import 'react-native-reanimated';
 import { onAuthChanged } from './firebase.config';
 
@@ -26,6 +27,11 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
+    // On web, skip Firebase auth listener
+    if (Platform.OS === 'web') {
+      return;
+    }
+
     const unsubscribe = onAuthChanged((user) => {
       if (user) {
         console.log('Auth state changed: User is signed in');
@@ -38,7 +44,8 @@ export default function RootLayout() {
     return () => unsubscribe();
   }, []);
 
-  if (!loaded) {
+  // On web, don't wait for fonts - load immediately
+  if (Platform.OS !== 'web' && !loaded) {
     return null;
   }
 

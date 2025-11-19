@@ -28,6 +28,7 @@ function LoginScreen() {
   useEffect(() => {
     // On web, skip Firebase auth and go directly to home screen
     if (Platform.OS === 'web') {
+      // Immediate redirect on web
       router.replace('/(app)/home');
       return;
     }
@@ -160,15 +161,9 @@ function LoginScreen() {
     }
   };
 
-  // On web, don't show login screen - redirect happens in useEffect
+  // On web, redirect immediately - don't render anything
   if (Platform.OS === 'web') {
-    return (
-      <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      </SafeAreaView>
-    );
+    return null; // Return null while redirecting
   }
 
   if (authInitializing) {
