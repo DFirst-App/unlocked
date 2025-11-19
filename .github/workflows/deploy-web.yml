@@ -61,16 +61,31 @@ jobs:
 
       - name: Build web app
         run: |
+          # Export Expo app to app subdirectory
           npx expo export --platform web --output-dir web-build/app
-        env:
-          EXPO_PUBLIC_BASE_PATH: /app
 
       - name: Setup landing page
         run: |
-          # Copy landing page to root
+          # Copy landing page to root (this will be served at /)
           cp index.html web-build/index.html
-          # Update the "Try Online" button to point to /app
-          sed -i 's|href="./app"|href="/app"|g' web-build/index.html || sed -i '' 's|href="./app"|href="/app"|g' web-build/index.html
+          
+      - name: Fix web app asset paths for subdirectory
+        run: |
+          # Fix asset paths in the web app's index.html to work from /app subdirectory
+          if [ -f "web-build/app/index.html" ]; then
+            # Use a more targeted approach - only fix the main index.html
+            # Update script and link tags to use /app prefix
+            sed -i 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html
+            sed -i 's|src="/assets|src="/app/assets|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/assets|src="/app/assets|g' web-build/app/index.html
+            sed -i 's|href="/_expo|href="/app/_expo|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|href="/_expo|href="/app/_expo|g' web-build/app/index.html
+            sed -i 's|href="/assets|href="/app/assets|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|href="/assets|href="/app/assets|g' web-build/app/index.html
+            # Fix base tag if it exists
+            sed -i 's|<base href="/"|<base href="/app/"|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|<base href="/"|<base href="/app/"|g' web-build/app/index.html
+            # Add base tag if it doesn't exist
+            if ! grep -q '<base' web-build/app/index.html; then
+              sed -i 's|<head>|<head>\n  <base href="/app/">|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|<head>|<head>\n  <base href="/app/">|g' web-build/app/index.html
+            fi
+          fi
 
       - name: Verify web build output
         run: |
