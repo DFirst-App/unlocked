@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View, Alert, Animated as RNAnimated, ActivityIndicator } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View, Alert, Animated as RNAnimated, ActivityIndicator, Platform } from 'react-native';
 import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withSpring, Easing, FadeIn, FadeOut, SlideInDown } from 'react-native-reanimated';
@@ -26,6 +26,12 @@ function LoginScreen() {
   const [authInitializing, setAuthInitializing] = useState(true);
 
   useEffect(() => {
+    // On web, skip Firebase auth and go directly to home screen
+    if (Platform.OS === 'web') {
+      router.replace('/(app)/home');
+      return;
+    }
+
     loadSavedEmail();
     rotation.value = withRepeat(
       withSequence(
@@ -153,6 +159,17 @@ function LoginScreen() {
       if (email) setResetEmail(email);
     }
   };
+
+  // On web, don't show login screen - redirect happens in useEffect
+  if (Platform.OS === 'web') {
+    return (
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (authInitializing) {
     return (

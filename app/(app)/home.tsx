@@ -49,10 +49,13 @@ const BOTS_URL = 'https://app.deriv.com/bot?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk'
 
 // OAuth URL - different redirect for web vs mobile
 const getOAuthUrl = () => {
-  const redirectUri = Platform.OS === 'web' 
-    ? encodeURIComponent(`${typeof window !== 'undefined' ? window.location.origin : ''}/oauth/callback`)
-    : 'dfirsttrader://oauth2/callback';
-  return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${redirectUri}`;
+  if (Platform.OS === 'web') {
+    // For web, use the full path including the base path
+    const basePath = typeof window !== 'undefined' ? window.location.pathname.split('/app')[0] + '/app' : '/unlocked/app';
+    const redirectUri = encodeURIComponent(`${typeof window !== 'undefined' ? window.location.origin : ''}${basePath}/oauth/callback`);
+    return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${redirectUri}`;
+  }
+  return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${encodeURIComponent('dfirsttrader://oauth2/callback')}`;
 };
 
 function HomeScreen() {

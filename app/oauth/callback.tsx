@@ -1,12 +1,17 @@
 import { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 
 export default function OAuthCallback() {
   useEffect(() => {
-    // Redirect to home screen - the home screen will handle the OAuth callback
-    // from the URL parameters
-    router.replace('/(app)/home');
+    // On web, preserve query parameters when redirecting to home
+    // The home screen will handle the OAuth callback from URL parameters
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const queryString = window.location.search;
+      router.replace(`/(app)/home${queryString}`);
+    } else {
+      router.replace('/(app)/home');
+    }
   }, []);
 
   return (
