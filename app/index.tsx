@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View, Alert, Animated as RNAnimated, ActivityIndicator, Platform } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link, router, Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withSpring, Easing, FadeIn, FadeOut, SlideInDown } from 'react-native-reanimated';
 import { loginWithEmail, resetPassword, onAuthChanged } from './firebase.config';
@@ -26,10 +26,8 @@ function LoginScreen() {
   const [authInitializing, setAuthInitializing] = useState(true);
 
   useEffect(() => {
-    // On web, skip Firebase auth and go directly to home screen
+    // On web, redirect is handled by Redirect component - skip this
     if (Platform.OS === 'web') {
-      // Immediate redirect on web
-      router.replace('/(app)/home');
       return;
     }
 
@@ -161,15 +159,9 @@ function LoginScreen() {
     }
   };
 
-  // On web, show minimal loading while redirecting
+  // On web, redirect immediately using Redirect component
   if (Platform.OS === 'web') {
-    return (
-      <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      </SafeAreaView>
-    );
+    return <Redirect href="/(app)/home" />;
   }
 
   if (authInitializing) {
