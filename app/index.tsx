@@ -161,9 +161,15 @@ function LoginScreen() {
     }
   };
 
-  // On web, redirect immediately - don't render anything
+  // On web, show minimal loading while redirecting
   if (Platform.OS === 'web') {
-    return null; // Return null while redirecting
+    return (
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      </SafeAreaView>
+    );
   }
 
   if (authInitializing) {
