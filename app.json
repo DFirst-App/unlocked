@@ -55,7 +55,7 @@
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png",
-      "baseUrl": "/unlocked/app"
+      "baseUrl": "/app"
     },
     "experiments": {
       "typedRoutes": true

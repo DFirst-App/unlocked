@@ -62,11 +62,9 @@ jobs:
       - name: Build web app
         run: |
           # Export Expo app to root first (Expo expects this)
-          # Set base path for Expo Router
-          export EXPO_PUBLIC_BASE_PATH=/unlocked/app
           npx expo export --platform web --output-dir web-build-temp
         env:
-          EXPO_PUBLIC_BASE_PATH: /unlocked/app
+          EXPO_PUBLIC_BASE_PATH: /app
 
       - name: Setup landing page and web app structure
         run: |
