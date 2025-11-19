@@ -161,11 +161,6 @@ const BOT_FEATURES = {
   'russianodds': ['5-Tick Analysis', 'Quick Recovery', 'Pattern Trading']
 };
 
-const SPECIAL_MARTINGALE = {
-  HIGH: ['DIFFERbot', 'metrodiffer'],
-  SAFE: ['safeoverbot', 'safeunderbot']
-} as const;
-
 const BOT_RATINGS = {
   'DIFFERbot': 4.5,
   'notouchbot': 4.6,
@@ -188,16 +183,6 @@ const DERIV_WS_URL = `wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`;
 const BOT_RUNNING_KEY = '@bot_running_state';
 const DISCLAIMER_SHOWN_KEY = '@disclaimer_shown';
 
-const getDefaultMartingale = (botType?: string) => {
-  if (SPECIAL_MARTINGALE.SAFE.includes(botType || '')) {
-    return '3.5';
-  }
-  if (SPECIAL_MARTINGALE.HIGH.includes(botType || '')) {
-    return '15';
-  }
-  return '2.1';
-};
-
 function BotScreen() {
   const { bot } = useLocalSearchParams();
   const [isRunning, setIsRunning] = useState(false);
@@ -205,7 +190,7 @@ function BotScreen() {
     initialStake: bot === 'smartvolatility' ? '1' : '0.35',
     takeProfit: '0',  // Will be updated when balance is confirmed
     stopLoss: '1000',
-    martingaleMultiplier: getDefaultMartingale(bot as string)
+    martingaleMultiplier: ['safeoverbot', 'safeunderbot', 'DIFFERbot', 'metrodiffer'].includes(bot as string) ? '15' : '2.1'
   });
   const [stats, setStats] = useState<BotStats>({
     currentStake: 0,
@@ -239,27 +224,7 @@ function BotScreen() {
 
   useEffect(() => {
     loadSavedConfig();
-    // Don't auto-load running state when bot changes - force user to manually start
-    // This ensures clean bot instance isolation
-    return () => {
-      // Cleanup when bot changes or component unmounts
-      if (ws?.botInstance) {
-        console.log('[Bot] Cleaning up bot instance on bot change:', ws.botInstance.constructor.name);
-        ws.botInstance.stop();
-        ws.botInstance = null;
-      }
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        try {
-          ws.send(JSON.stringify({ forget_all: ['ticks', 'proposal', 'proposal_open_contract', 'balance'] }));
-          ws.close();
-        } catch (error) {
-          console.error('[Bot] Error during cleanup:', error);
-        }
-      }
-      setWs(null);
-      setIsRunning(false);
-      setStartTime(null);
-    };
+    loadRunningState();
   }, [bot]);
 
   useEffect(() => {
@@ -337,16 +302,10 @@ function BotScreen() {
       const savedState = await AsyncStorage.getItem(BOT_RUNNING_KEY);
       if (savedState) {
         const { isRunning: wasRunning, botType } = JSON.parse(savedState);
-        // Only restore if it's the same bot type - ensure bot isolation
         if (wasRunning && botType === bot) {
-          console.log('[Bot] Restoring running state for bot:', botType);
           setIsRunning(true);
           // Reconnect WebSocket if bot was running
           handleStartBot();
-        } else if (wasRunning && botType !== bot) {
-          // Clear stale running state for different bot
-          console.log('[Bot] Clearing stale running state for different bot:', botType, 'current:', bot);
-          await AsyncStorage.removeItem(BOT_RUNNING_KEY);
         }
       }
     } catch (error) {
@@ -454,8 +413,6 @@ function BotScreen() {
     if (isRunning && !stopButtonDisabled) {
       setIsLoading(true);
       console.log('[Bot] Stopping bot...');
-      const botInstanceName = ws?.botInstance ? ws.botInstance.constructor.name : 'unknown';
-      console.log('[Bot] Stopping bot instance:', botInstanceName);
       setCleanupVerified(false);
       setIsRunning(false);
       await saveRunningState(false);
@@ -463,19 +420,15 @@ function BotScreen() {
       if (ws) {
         try {
           if (ws.botInstance) {
-            console.log('[Bot] Calling stop() on bot instance:', ws.botInstance.constructor.name);
             ws.botInstance.stop();
             ws.botInstance = null;
-            console.log('[Bot] Bot instance stopped and cleared');
           }
           if (ws.readyState === WebSocket.OPEN) {
-            console.log('[Bot] Sending forget_all and closing WebSocket');
             ws.send(JSON.stringify({ 
               forget_all: ['ticks', 'proposal', 'proposal_open_contract', 'balance'] 
             }));
             await new Promise(resolve => setTimeout(resolve, 1000));
             ws.close();
-            console.log('[Bot] WebSocket closed');
           }
         } catch (error) {
           console.error('[Bot] Error stopping bot:', error);
@@ -579,28 +532,6 @@ function BotScreen() {
         authToken = savedKey;
       }
 
-      // Ensure no previous WebSocket/bot instance is running before starting a new one
-      if (ws?.botInstance) {
-        console.log('[Bot] Cleaning previous bot instance before new start:', ws.botInstance.constructor.name);
-        try {
-          ws.botInstance.stop();
-        } catch (error) {
-          console.error('[Bot] Error stopping previous bot instance:', error);
-        }
-        ws.botInstance = null;
-      }
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        try {
-          console.log('[Bot] Closing previous WebSocket connection before new start');
-          ws.send(JSON.stringify({ forget_all: ['ticks', 'proposal', 'proposal_open_contract', 'balance'] }));
-          await new Promise(resolve => setTimeout(resolve, 500));
-          ws.close();
-        } catch (error) {
-          console.error('[Bot] Error closing previous WebSocket:', error);
-        }
-      }
-      setWs(null);
-
       const wsInstance = new WebSocket(DERIV_WS_URL) as BotWebSocket;
       console.log('[Bot] Initializing WebSocket connection...');
       setWs(wsInstance);
@@ -680,26 +611,16 @@ function BotScreen() {
             }
 
             // Start bot if balance is sufficient
-            const currentBotType = bot as keyof typeof BOT_CLASSES;
-            
-            // CRITICAL: Stop any existing bot instance before creating a new one
-            // This ensures bot isolation and prevents old bot instances from continuing to trade
-            if (wsInstance.botInstance) {
-              console.log('[Bot] Stopping existing bot instance before starting new one:', wsInstance.botInstance.constructor.name);
-              wsInstance.botInstance.stop();
-              wsInstance.botInstance = null;
-            }
-            
-            const BotClass = BOT_CLASSES[currentBotType];
+            const BotClass = BOT_CLASSES[bot as keyof typeof BOT_CLASSES];
             if (!BotClass) {
-              console.error('[Bot] Bot class not found:', currentBotType);
+              console.error('[Bot] Bot class not found:', bot);
               Alert.alert('Error', 'Bot not found');
               wsInstance.close();
               setWs(null);
               return;
             }
 
-            console.log('[Bot] Starting bot:', currentBotType, 'Class:', BotClass.name);
+            console.log('[Bot] Starting bot:', bot);
             const botInstance = new BotClass(wsInstance, {
               initialStake: parseFloat(config.initialStake),
               takeProfit: parseFloat(config.takeProfit),
@@ -709,7 +630,6 @@ function BotScreen() {
 
             // Store bot instance in WebSocket for cleanup
             wsInstance.botInstance = botInstance;
-            console.log('[Bot] Bot instance created and stored:', botInstance.constructor.name, 'for bot type:', currentBotType);
 
             botInstance.setUpdateCallback((stats: BotStats) => {
               console.log('[Bot] Stats update:', stats);
@@ -880,13 +800,9 @@ function BotScreen() {
                   setAccountInfo(updatedAccountInfo);
                 }
 
-                // Forward messages to bot while running - ensure we're using the correct bot instance
-                const currentBotInstance = wsInstance.botInstance;
-                if (currentBotInstance && currentBotInstance.isRunning) {
-                  console.log('[Bot] Forwarding message to bot:', currentBotInstance.constructor.name, 'Message type:', data.msg_type);
-                  currentBotInstance.handleMessage(msg.data);
-                } else {
-                  console.log('[Bot] Bot instance not running or not found. Instance:', currentBotInstance ? currentBotInstance.constructor.name : 'null', 'Running:', currentBotInstance?.isRunning);
+                // Forward messages to bot while running
+                if (wsInstance.botInstance && wsInstance.botInstance.isRunning) {
+                  wsInstance.botInstance.handleMessage(msg.data);
                 }
               } catch (error) {
                 console.error('[Bot] Error processing message:', error);

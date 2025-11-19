@@ -22,29 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.DFirst",
-      "buildNumber": "1",
-      "infoPlist": {
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": ["dfirsttrader"],
-            "CFBundleURLName": "com.anonymous.DFirst"
-          }
-        ],
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": false,
-          "NSExceptionDomains": {
-            "deriv.com": {
-              "NSExceptionAllowsInsecureHTTPLoads": false,
-              "NSIncludesSubdomains": true
-            }
-          }
-        },
-        "NSCameraUsageDescription": "This app needs access to your camera to take photos for your profile.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select images.",
-        "NSMicrophoneUsageDescription": "This app does not use the microphone."
-      },
-      "associatedDomains": ["applinks:dfirsttrader.com"]
+      "bundleIdentifier": "com.anonymous.DFirst"
     },
     "android": {
       "adaptiveIcon": {

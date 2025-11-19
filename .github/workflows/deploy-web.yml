@@ -1,0 +1,73 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'utils/**'
+      - 'package.json'
+      - 'app.json'
+      - '.github/workflows/deploy-web.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Create google-services.json
+        run: |
+          echo '{
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "dfirst-mobile",
+              "storage_bucket": "dfirst-mobile.appspot.com"
+            },
+            "client": [{
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                "android_client_info": {
+                  "package_name": "com.anonymous.DFirst"
+                }
+              },
+              "api_key": [{
+                "current_key": "dummy_key"
+              }]
+            }]
+          }' > google-services.json
+
+      - name: Build web app
+        run: |
+          npx expo export --platform web --output-dir web-build
+        env:
+          EXPO_PUBLIC_BASE_PATH: /unlocked/app
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './web-build'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

@@ -17,13 +17,6 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# iOS
-ios/
-*.ipa
-*.xcarchive
-Pods/
-DerivedData/
-
 # Metro
 .metro-health-check*
 

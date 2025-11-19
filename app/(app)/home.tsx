@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, TouchableOpacity, View, Modal, TextInput, Linking, Alert, ScrollView } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Modal, TextInput, Linking, Alert, ScrollView, Platform } from 'react-native';
 import { router, useSegments, Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logout, getCurrentUser } from '../firebase.config';
@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { storage } from '@/utils/storage';
 
 import { ThemedText } from '@/components/ThemedText';
 
@@ -45,7 +46,14 @@ const DEFAULT_P2P_WITHDRAW = "https://p2p.deriv.com/advertiser/426826?advert_id=
 const DEFAULT_PA_DEPOSIT = "";
 const DEFAULT_PA_WITHDRAW = "";
 const BOTS_URL = 'https://app.deriv.com/bot?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
-const OAUTH_URL = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=dfirsttrader://oauth2/callback`;
+
+// OAuth URL - different redirect for web vs mobile
+const getOAuthUrl = () => {
+  const redirectUri = Platform.OS === 'web' 
+    ? encodeURIComponent(`${typeof window !== 'undefined' ? window.location.origin : ''}/oauth/callback`)
+    : 'dfirsttrader://oauth2/callback';
+  return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${redirectUri}`;
+};
 
 function HomeScreen() {
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
@@ -75,15 +83,19 @@ function HomeScreen() {
   );
 
   const getUserSpecificKey = (baseKey: string) => {
+    // On web, don't use user-specific keys (no Firebase auth required)
+    if (Platform.OS === 'web') {
+      return baseKey;
+    }
     const user = getCurrentUser();
     return user ? `${baseKey}_${user.uid}` : baseKey;
   };
 
   const checkExistingConnections = async () => {
     try {
-      const savedTokens = await AsyncStorage.getItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
-      const savedKey = await AsyncStorage.getItem(getUserSpecificKey(DERIV_API_KEY));
-      const firstLoginFlag = await AsyncStorage.getItem('@first_login');
+      const savedTokens = await storage.getItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
+      const savedKey = await storage.getItem(getUserSpecificKey(DERIV_API_KEY));
+      const firstLoginFlag = await storage.getItem('@first_login');
       
       setIsFirstLogin(!firstLoginFlag);
       
@@ -107,6 +119,16 @@ function HomeScreen() {
   };
 
   const loadP2PLinks = async () => {
+    // Skip on web - use default links
+    if (Platform.OS === 'web') {
+      setP2pDepositLink(DEFAULT_P2P_DEPOSIT);
+      setP2pWithdrawLink(DEFAULT_P2P_WITHDRAW);
+      setPaDepositLink(DEFAULT_PA_DEPOSIT);
+      setPaWithdrawLink(DEFAULT_PA_WITHDRAW);
+      setUsePaymentAgent(false);
+      return;
+    }
+
     try {
       const currentUser = getCurrentUser();
       if (!currentUser) return;
@@ -282,11 +304,11 @@ function HomeScreen() {
   const handleDisconnect = async () => {
     try {
       if (isOAuthConnected) {
-        await AsyncStorage.removeItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
+        await storage.removeItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
         setOauthTokens(null);
         setIsOAuthConnected(false);
       } else {
-        await AsyncStorage.removeItem(getUserSpecificKey(DERIV_API_KEY));
+        await storage.removeItem(getUserSpecificKey(DERIV_API_KEY));
       }
       setAccount(null);
       setLoading(false);
@@ -318,11 +340,11 @@ function HomeScreen() {
     try {
       const connected = await connectWithKey(keyToUse.trim());
       if (connected) {
-        await AsyncStorage.setItem(getUserSpecificKey(DERIV_API_KEY), keyToUse.trim());
+        await storage.setItem(getUserSpecificKey(DERIV_API_KEY), keyToUse.trim());
         setPreviousApiKey('');
       } else {
         Alert.alert('Error', 'Failed to connect with API key');
-        await AsyncStorage.removeItem(getUserSpecificKey(DERIV_API_KEY));
+        await storage.removeItem(getUserSpecificKey(DERIV_API_KEY));
       }
     } catch (error) {
       console.error('Error saving API key:', error);
@@ -334,9 +356,11 @@ function HomeScreen() {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      await AsyncStorage.removeItem(getUserSpecificKey(DERIV_API_KEY));
-      await AsyncStorage.removeItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
+      if (Platform.OS !== 'web') {
+        await logout();
+      }
+      await storage.removeItem(getUserSpecificKey(DERIV_API_KEY));
+      await storage.removeItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
       router.replace('/');
     } catch (error) {
       console.error('Logout error:', error);
@@ -345,9 +369,17 @@ function HomeScreen() {
 
   const handleOAuthLogin = async () => {
     try {
-      await AsyncStorage.setItem('@first_login', 'true');
+      await storage.setItem('@first_login', 'true');
       setIsFirstLogin(false);
-      await Linking.openURL(OAUTH_URL);
+      const oauthUrl = getOAuthUrl();
+      
+      if (Platform.OS === 'web') {
+        // On web, redirect directly
+        window.location.href = oauthUrl;
+      } else {
+        // On mobile, use deep linking
+        await Linking.openURL(oauthUrl);
+      }
     } catch (error) {
       console.error('Error opening OAuth URL:', error);
       Alert.alert('Error', 'Failed to open OAuth login');
@@ -355,7 +387,15 @@ function HomeScreen() {
   };
 
   const parseOAuthCallback = (url: string): DerivOAuthTokens => {
-    const params = new URLSearchParams(url.split('?')[1]);
+    // Handle both web URL format and mobile deep link format
+    let queryString = '';
+    if (url.includes('?')) {
+      queryString = url.split('?')[1].split('#')[0];
+    } else if (url.includes('acct1=')) {
+      queryString = url;
+    }
+    
+    const params = new URLSearchParams(queryString);
     const accounts = [];
     let i = 1;
     
@@ -377,7 +417,7 @@ function HomeScreen() {
   const handleOAuthCallback = async (url: string) => {
     try {
       const tokens = parseOAuthCallback(url);
-      await AsyncStorage.setItem(getUserSpecificKey(DERIV_OAUTH_TOKENS), JSON.stringify(tokens));
+      await storage.setItem(getUserSpecificKey(DERIV_OAUTH_TOKENS), JSON.stringify(tokens));
       setOauthTokens(tokens);
       setIsOAuthConnected(true);
       
@@ -553,6 +593,12 @@ function HomeScreen() {
   };
 
   const checkAdminStatus = async () => {
+    // Skip on web - no admin features
+    if (Platform.OS === 'web') {
+      setIsAdmin(false);
+      return;
+    }
+
     try {
       const user = getCurrentUser();
       if (!user) return;
@@ -568,26 +614,42 @@ function HomeScreen() {
   };
 
   useEffect(() => {
-    const subscription = Linking.addEventListener('url', (event) => {
-      if (event.url.includes('dfirsttrader://oauth2/callback')) {
-        handleOAuthCallback(event.url);
-        // Ensure we're on the home screen after OAuth callback
+    // Handle OAuth callback on web
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasOAuthParams = urlParams.has('acct1') && urlParams.has('token1');
+      
+      if (hasOAuthParams) {
+        // Build callback URL from query params
+        const callbackUrl = `${window.location.origin}${window.location.pathname}?${window.location.search}`;
+        handleOAuthCallback(callbackUrl);
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
         router.replace('/(app)/home');
       }
-    });
+    }
 
-    // Check for initial URL (app opened via OAuth callback)
-    Linking.getInitialURL().then(url => {
-      if (url && url.includes('dfirsttrader://oauth2/callback')) {
-        handleOAuthCallback(url);
-        // Ensure we're on the home screen for initial URL
-        router.replace('/(app)/home');
-      }
-    });
+    // Handle OAuth callback on mobile
+    if (Platform.OS !== 'web') {
+      const subscription = Linking.addEventListener('url', (event) => {
+        if (event.url.includes('dfirsttrader://oauth2/callback')) {
+          handleOAuthCallback(event.url);
+          router.replace('/(app)/home');
+        }
+      });
 
-    return () => {
-      subscription.remove();
-    };
+      // Check for initial URL (app opened via OAuth callback)
+      Linking.getInitialURL().then(url => {
+        if (url && url.includes('dfirsttrader://oauth2/callback')) {
+          handleOAuthCallback(url);
+          router.replace('/(app)/home');
+        }
+      });
+
+      return () => {
+        subscription.remove();
+      };
+    }
   }, []);
 
   return (
@@ -595,12 +657,14 @@ function HomeScreen() {
       <View style={styles.header}>
         <ThemedText style={styles.title}>DFirst Trader</ThemedText>
         <View style={styles.headerButtons}>
-          <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={() => setShowLogoutModal(true)}
-          >
-            <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-          </TouchableOpacity>
+          {Platform.OS !== 'web' && (
+            <TouchableOpacity 
+              style={styles.logoutButton}
+              onPress={() => setShowLogoutModal(true)}
+            >
+              <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+            </TouchableOpacity>
+          )}
           <Link href="/(app)/settings" asChild>
             <TouchableOpacity style={styles.settingsButton}>
               <Ionicons name="settings-outline" size={24} color="#1E293B" />
