@@ -63,8 +63,6 @@ jobs:
         run: |
           # Export Expo app to root first (Expo expects this)
           npx expo export --platform web --output-dir web-build-temp
-        env:
-          EXPO_PUBLIC_BASE_PATH: /unlocked/app
 
       - name: Setup landing page and web app structure
         run: |
@@ -112,19 +110,19 @@ try:
         content = f.read()
     
     # Add base tag after <head> if it doesn't exist
+    # Use relative path since we're in /app subdirectory of /unlocked
     if '<base' not in content:
         # Find <head> tag and insert base tag after it
-        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="/unlocked/app/">', content, count=1)
-        print("Added <base href=\"/unlocked/app/\"> tag")
+        # Base should be relative to current location: if we're at /unlocked/app/, base should be ./
+        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="./">', content, count=1)
+        print("Added <base href=\"./\"> tag (relative path)")
     else:
         print("Base tag already exists")
     
-    # Fix all absolute paths to use /unlocked/app prefix
+    # Don't fix absolute paths - let the base tag handle relative paths
+    # Only fix paths that are explicitly absolute and need to stay absolute
     original_content = content
-    content = re.sub(r'src="/(_expo|assets)', r'src="/unlocked/app/\1', content)
-    content = re.sub(r'href="/(_expo|assets)', r'href="/unlocked/app/\1', content)
-    content = re.sub(r'"/oauth', '"/unlocked/app/oauth', content)
-    content = re.sub(r'"/(app)', '"/unlocked/app/(app', content)
+    # Keep relative paths as-is, they'll be resolved by the base tag
     
     if content != original_content:
         print("Fixed absolute paths in index.html")
@@ -139,30 +137,22 @@ except Exception as e:
 PYTHON_SCRIPT
             
             # Verify base tag was added
-            if ! grep -q '<base href="/unlocked/app/">' web-build/app/index.html; then
+            if ! grep -q '<base href' web-build/app/index.html; then
               echo "Warning: Base tag might not have been added correctly"
               echo "First 20 lines of index.html:"
               head -20 web-build/app/index.html || true
             else
               echo "✅ Base tag confirmed in index.html"
+              grep '<base' web-build/app/index.html || true
             fi
           else
             echo "Error: web-build/app/index.html not found!"
             exit 1
           fi
           
-          # Also fix paths in JavaScript bundles that might have hardcoded paths
-          echo "Fixing paths in JavaScript bundles..."
-          js_count=$(find web-build/app -name "*.js" -type f | wc -l)
-          echo "Found $js_count JavaScript files to process"
-          
-          find web-build/app -name "*.js" -type f -exec sed -i 's|"/_expo|"/unlocked/app/_expo|g' {} \; 2>/dev/null || \
-          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/_expo|"/unlocked/app/_expo|g' {} \; || true
-          
-          find web-build/app -name "*.js" -type f -exec sed -i 's|"/assets|"/unlocked/app/assets|g' {} \; 2>/dev/null || \
-          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/assets|"/unlocked/app/assets|g' {} \; || true
-          
-          echo "✅ Path fixing complete"
+          # With relative base tag, we don't need to fix JS paths
+          # The base tag will handle relative path resolution
+          echo "✅ Path fixing complete (using relative base tag)"
 
       - name: Verify web build output
         run: |
@@ -198,11 +188,23 @@ PYTHON_SCRIPT
           echo "Total build size: $(du -sh web-build | cut -f1)"
           echo ""
           echo "=== Verification: Base tag in web app ==="
-          if grep -q '<base href="/unlocked/app/">' web-build/app/index.html; then
+          if grep -q '<base href' web-build/app/index.html; then
             echo "✅ Base tag found in web app index.html"
             grep '<base' web-build/app/index.html || true
           else
             echo "❌ Base tag NOT found in web app index.html!"
+          fi
+          echo ""
+          echo "=== Verification: Directory structure ==="
+          echo "Checking if app directory exists and has files:"
+          if [ -d "web-build/app" ]; then
+            echo "✅ web-build/app directory exists"
+            file_count=$(find web-build/app -type f | wc -l)
+            echo "   Found $file_count files in app directory"
+            echo "   Sample files:"
+            find web-build/app -type f | head -10 || true
+          else
+            echo "❌ web-build/app directory does NOT exist!"
           fi
           echo ""
           echo "=== Verification: .nojekyll file ==="
