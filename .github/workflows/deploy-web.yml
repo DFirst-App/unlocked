@@ -90,18 +90,69 @@ jobs:
         run: |
           # Fix paths in the web app to work from /app
           if [ -f "web-build/app/index.html" ]; then
-            # Add base tag to fix all relative paths
-            if ! grep -q '<base' web-build/app/index.html; then
-              # Insert base tag right after <head>
-              sed -i '0,/<head>/s//<head>\n  <base href="\/app\/">/' web-build/app/index.html 2>/dev/null || \
-              sed -i '' '0,/<head>/s//<head>\n  <base href="\/app\/">/' web-build/app/index.html || \
-              perl -i -pe 's|<head>|<head>\n  <base href="/app/">|' web-build/app/index.html
-            fi
+            echo "Fixing web app index.html paths..."
             
-            # Also fix any absolute paths that might exist
-            sed -i 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/_expo|src="/app/_expo|g' web-build/app/index.html
-            sed -i 's|src="/assets|src="/app/assets|g' web-build/app/index.html 2>/dev/null || sed -i '' 's|src="/assets|src="/app/assets|g' web-build/app/index.html
+            # Use Python for reliable base tag insertion
+            python3 << 'PYTHON_SCRIPT'
+import re
+import sys
+
+try:
+    with open('web-build/app/index.html', 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Add base tag after <head> if it doesn't exist
+    if '<base' not in content:
+        # Find <head> tag and insert base tag after it
+        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="/app/">', content, count=1)
+        print("Added <base href=\"/app/\"> tag")
+    else:
+        print("Base tag already exists")
+    
+    # Fix all absolute paths to use /app prefix
+    original_content = content
+    content = re.sub(r'src="/(_expo|assets)', r'src="/app/\1', content)
+    content = re.sub(r'href="/(_expo|assets)', r'href="/app/\1', content)
+    content = re.sub(r'"/oauth', '"/app/oauth', content)
+    content = re.sub(r'"/(app)', '"/app/(app', content)
+    
+    if content != original_content:
+        print("Fixed absolute paths in index.html")
+    
+    with open('web-build/app/index.html', 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    print("✅ Successfully fixed web-build/app/index.html")
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+PYTHON_SCRIPT
+            
+            # Verify base tag was added
+            if ! grep -q '<base href="/app/">' web-build/app/index.html; then
+              echo "Warning: Base tag might not have been added correctly"
+              echo "First 20 lines of index.html:"
+              head -20 web-build/app/index.html || true
+            else
+              echo "✅ Base tag confirmed in index.html"
+            fi
+          else
+            echo "Error: web-build/app/index.html not found!"
+            exit 1
           fi
+          
+          # Also fix paths in JavaScript bundles that might have hardcoded paths
+          echo "Fixing paths in JavaScript bundles..."
+          js_count=$(find web-build/app -name "*.js" -type f | wc -l)
+          echo "Found $js_count JavaScript files to process"
+          
+          find web-build/app -name "*.js" -type f -exec sed -i 's|"/_expo|"/app/_expo|g' {} \; 2>/dev/null || \
+          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/_expo|"/app/_expo|g' {} \; || true
+          
+          find web-build/app -name "*.js" -type f -exec sed -i 's|"/assets|"/app/assets|g' {} \; 2>/dev/null || \
+          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/assets|"/app/assets|g' {} \; || true
+          
+          echo "✅ Path fixing complete"
 
       - name: Verify web build output
         run: |
@@ -136,8 +187,16 @@ jobs:
           echo "Web app: web-build/app/index.html ($(du -h web-build/app/index.html | cut -f1))"
           echo "Total build size: $(du -sh web-build | cut -f1)"
           echo ""
-          echo "=== Sample of web app index.html ==="
-          head -30 web-build/app/index.html || true
+          echo "=== Verification: Base tag in web app ==="
+          if grep -q '<base href="/app/">' web-build/app/index.html; then
+            echo "✅ Base tag found in web app index.html"
+            grep '<base' web-build/app/index.html || true
+          else
+            echo "❌ Base tag NOT found in web app index.html!"
+          fi
+          echo ""
+          echo "=== Sample of web app index.html (first 40 lines) ==="
+          head -40 web-build/app/index.html || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
