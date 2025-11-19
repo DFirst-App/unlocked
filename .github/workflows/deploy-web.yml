@@ -64,7 +64,7 @@ jobs:
           # Export Expo app to root first (Expo expects this)
           npx expo export --platform web --output-dir web-build-temp
         env:
-          EXPO_PUBLIC_BASE_PATH: /app
+          EXPO_PUBLIC_BASE_PATH: /unlocked/app
 
       - name: Setup landing page and web app structure
         run: |
@@ -82,6 +82,16 @@ jobs:
           
           # Copy landing page to root
           cp index.html web-build/index.html
+          
+          # Copy .nojekyll to root (critical for GitHub Pages to serve _expo files)
+          if [ -f ".nojekyll" ]; then
+            cp .nojekyll web-build/.nojekyll
+            echo "✅ Copied .nojekyll to web-build root"
+          else
+            # Create .nojekyll if it doesn't exist
+            touch web-build/.nojekyll
+            echo "✅ Created .nojekyll in web-build root"
+          fi
           
           echo "Files moved to web-build/app/:"
           ls -la web-build/app/ | head -20 || true
@@ -104,17 +114,17 @@ try:
     # Add base tag after <head> if it doesn't exist
     if '<base' not in content:
         # Find <head> tag and insert base tag after it
-        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="/app/">', content, count=1)
-        print("Added <base href=\"/app/\"> tag")
+        content = re.sub(r'(<head[^>]*>)', r'\1\n  <base href="/unlocked/app/">', content, count=1)
+        print("Added <base href=\"/unlocked/app/\"> tag")
     else:
         print("Base tag already exists")
     
-    # Fix all absolute paths to use /app prefix
+    # Fix all absolute paths to use /unlocked/app prefix
     original_content = content
-    content = re.sub(r'src="/(_expo|assets)', r'src="/app/\1', content)
-    content = re.sub(r'href="/(_expo|assets)', r'href="/app/\1', content)
-    content = re.sub(r'"/oauth', '"/app/oauth', content)
-    content = re.sub(r'"/(app)', '"/app/(app', content)
+    content = re.sub(r'src="/(_expo|assets)', r'src="/unlocked/app/\1', content)
+    content = re.sub(r'href="/(_expo|assets)', r'href="/unlocked/app/\1', content)
+    content = re.sub(r'"/oauth', '"/unlocked/app/oauth', content)
+    content = re.sub(r'"/(app)', '"/unlocked/app/(app', content)
     
     if content != original_content:
         print("Fixed absolute paths in index.html")
@@ -129,7 +139,7 @@ except Exception as e:
 PYTHON_SCRIPT
             
             # Verify base tag was added
-            if ! grep -q '<base href="/app/">' web-build/app/index.html; then
+            if ! grep -q '<base href="/unlocked/app/">' web-build/app/index.html; then
               echo "Warning: Base tag might not have been added correctly"
               echo "First 20 lines of index.html:"
               head -20 web-build/app/index.html || true
@@ -146,11 +156,11 @@ PYTHON_SCRIPT
           js_count=$(find web-build/app -name "*.js" -type f | wc -l)
           echo "Found $js_count JavaScript files to process"
           
-          find web-build/app -name "*.js" -type f -exec sed -i 's|"/_expo|"/app/_expo|g' {} \; 2>/dev/null || \
-          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/_expo|"/app/_expo|g' {} \; || true
+          find web-build/app -name "*.js" -type f -exec sed -i 's|"/_expo|"/unlocked/app/_expo|g' {} \; 2>/dev/null || \
+          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/_expo|"/unlocked/app/_expo|g' {} \; || true
           
-          find web-build/app -name "*.js" -type f -exec sed -i 's|"/assets|"/app/assets|g' {} \; 2>/dev/null || \
-          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/assets|"/app/assets|g' {} \; || true
+          find web-build/app -name "*.js" -type f -exec sed -i 's|"/assets|"/unlocked/app/assets|g' {} \; 2>/dev/null || \
+          find web-build/app -name "*.js" -type f -exec sed -i '' 's|"/assets|"/unlocked/app/assets|g' {} \; || true
           
           echo "✅ Path fixing complete"
 
@@ -188,11 +198,18 @@ PYTHON_SCRIPT
           echo "Total build size: $(du -sh web-build | cut -f1)"
           echo ""
           echo "=== Verification: Base tag in web app ==="
-          if grep -q '<base href="/app/">' web-build/app/index.html; then
+          if grep -q '<base href="/unlocked/app/">' web-build/app/index.html; then
             echo "✅ Base tag found in web app index.html"
             grep '<base' web-build/app/index.html || true
           else
             echo "❌ Base tag NOT found in web app index.html!"
+          fi
+          echo ""
+          echo "=== Verification: .nojekyll file ==="
+          if [ -f "web-build/.nojekyll" ]; then
+            echo "✅ .nojekyll file found in web-build root"
+          else
+            echo "❌ .nojekyll file NOT found in web-build root!"
           fi
           echo ""
           echo "=== Sample of web app index.html (first 40 lines) ==="
