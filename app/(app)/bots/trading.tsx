@@ -66,7 +66,7 @@ const bots: BotCard[] = [
     file: 'russianodds',
     color: '#FF4081',
     rating: 4.6,
-    locked: true
+    locked: false
   },
   {
     name: 'Smart Volatility Bot',
@@ -86,7 +86,7 @@ const bots: BotCard[] = [
     file: 'smarteven',
     color: '#673AB7',
     rating: 4.8,
-    locked: true
+    locked: false
   },
   {
     name: 'Alien Rise Fall Bot',
@@ -116,7 +116,7 @@ const bots: BotCard[] = [
     file: 'notouchbot',
     color: '#D4A5A5',
     rating: 4.6,
-    locked: true
+    locked: false
   },
   {
     name: 'Rise Fall Bot',
@@ -126,7 +126,7 @@ const bots: BotCard[] = [
     file: 'risefallbot',
     color: '#2A363B',
     rating: 4.9,
-    locked: true
+    locked: false
   },
   {
     name: 'High Risk Over Bot',
@@ -136,7 +136,7 @@ const bots: BotCard[] = [
     file: 'overbot',
     color: '#FFA726',
     rating: 4.4,
-    locked: true
+    locked: false
   },
   {
     name: 'High Risk Under Bot',
@@ -146,7 +146,7 @@ const bots: BotCard[] = [
     file: 'underbot',
     color: '#99B898',
     rating: 4.3,
-    locked: true
+    locked: false
   }
 ];
 
@@ -396,9 +396,7 @@ function BotCard({ bot }: { bot: BotCard }) {
           <ActivityIndicator color="#FFFFFF" />
         ) : (
           <View style={styles.accessButtonContent}>
-            <ThemedText style={styles.buttonText}>
-              {bot.locked ? 'Locked Bot 🔒' : 'Open Bot'}
-            </ThemedText>
+            <ThemedText style={styles.buttonText}>Open Bot</ThemedText>
           </View>
         )}
       </TouchableOpacity>
@@ -420,18 +418,11 @@ function BotCard({ bot }: { bot: BotCard }) {
               {bot.features[0]} • {bot.features[1]} • {bot.features[2]}
             </ThemedText>
 
+            <ThemedText style={styles.tipsText}>
+              {"💡 TRADING TIPS:\n• The most important aspect of Deriv trading is risk management\n• Trust in slow, steady growth - avoid rushing for quick profits\n• Focus on consistent small wins rather than risky big trades"}
+            </ThemedText>
             <ThemedText style={styles.modalDescription}>
-              {bot.locked ? 
-                "Unfortunately, this bot is currently locked. Join our community to connect with like-minded traders and share trading ideas!" :
-                <View>
-                  <ThemedText style={styles.tipsText}>
-                    {"💡 TRADING TIPS:\n• The most important aspect of Deriv trading is risk management\n• Trust in slow, steady growth - avoid rushing for quick profits\n• Focus on consistent small wins rather than risky big trades"}
-                  </ThemedText>
-                  <ThemedText style={styles.modalDescription}>
-                    {"Before you start trading, join our community to connect with like-minded traders and share trading ideas!"}
-                  </ThemedText>
-                </View>
-              }
+              {"Before you start trading, join our community to connect with like-minded traders and share trading ideas!"}
             </ThemedText>
 
             <View style={styles.modalButtons}>
