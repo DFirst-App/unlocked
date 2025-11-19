@@ -19,6 +19,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -89,7 +91,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: './web-build'
-          if-no-files-found: error
 
       - name: Deploy to GitHub Pages
         id: deployment
