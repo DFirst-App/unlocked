@@ -59,7 +59,7 @@
       if (accounts.length === 0) {
         console.error('No OAuth tokens found in callback');
         alert('Failed to connect. Please try again.');
-        window.location.href = '/unlocked/WebBots/';
+        window.location.href = window.location.origin + '/unlocked/WebBots/';
         return null;
       }
 
@@ -87,11 +87,12 @@
       
       if (tokens) {
         if (storeOAuthTokens(tokens)) {
-          // Redirect back to dashboard
-          window.location.href = '/unlocked/WebBots/';
+          // Redirect back to dashboard with OAuth params so it can process them
+          const params = new URLSearchParams(window.location.search);
+          window.location.href = window.location.origin + '/unlocked/WebBots/?' + params.toString();
         } else {
           alert('Failed to save connection. Please try again.');
-          window.location.href = '/unlocked/WebBots/';
+          window.location.href = window.location.origin + '/unlocked/WebBots/';
         }
       }
     }

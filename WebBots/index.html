@@ -326,7 +326,8 @@
 
     // Get OAuth URL with proper redirect
     function getOAuthUrl() {
-      const redirectUri = encodeURIComponent('https://dfirst-app.github.io/unlocked/WebBots/oauth-callback.html');
+      // Use the dashboard URL itself as redirect (Deriv will append OAuth params)
+      const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
       return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${redirectUri}`;
     }
 
@@ -473,8 +474,68 @@
       }
     }
 
+    // Parse OAuth callback from URL parameters
+    function parseOAuthCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const accounts = [];
+      let i = 1;
+      
+      while (urlParams.has(`acct${i}`) && urlParams.has(`token${i}`) && urlParams.has(`cur${i}`)) {
+        accounts.push({
+          account: urlParams.get(`acct${i}`),
+          token: urlParams.get(`token${i}`),
+          currency: urlParams.get(`cur${i}`).toUpperCase()
+        });
+        i++;
+      }
+
+      if (accounts.length === 0) {
+        return null;
+      }
+
+      return {
+        accounts: accounts,
+        selectedAccount: accounts[0]
+      };
+    }
+
+    // Handle OAuth callback from URL
+    async function handleOAuthCallbackFromUrl() {
+      const tokens = parseOAuthCallback();
+      
+      if (tokens) {
+        // Store tokens
+        try {
+          localStorage.setItem(DERIV_OAUTH_TOKENS_KEY, JSON.stringify(tokens));
+          console.log('OAuth tokens stored from callback');
+          
+          // Clean up URL (remove OAuth parameters)
+          window.history.replaceState({}, '', window.location.pathname);
+          
+          // Connect with the token
+          try {
+            await connectWithOAuth(tokens.selectedAccount.token);
+          } catch (error) {
+            console.error('Failed to connect after OAuth:', error);
+            alert('Connected but failed to load account data. Please refresh.');
+          }
+        } catch (error) {
+          console.error('Error storing OAuth tokens:', error);
+          alert('Failed to save connection. Please try again.');
+        }
+      }
+    }
+
     // Check for existing connection on page load
     async function checkExistingConnection() {
+      // First, check if this is an OAuth callback
+      const oauthTokens = parseOAuthCallback();
+      if (oauthTokens) {
+        await handleOAuthCallbackFromUrl();
+        return;
+      }
+
+      // Otherwise, check for stored tokens
       const tokens = getStoredTokens();
       
       if (tokens && tokens.selectedAccount) {
