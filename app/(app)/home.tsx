@@ -360,7 +360,7 @@ function HomeScreen() {
   const handleLogout = async () => {
     try {
       if (Platform.OS !== 'web') {
-        await logout();
+      await logout();
       }
       await storage.removeItem(getUserSpecificKey(DERIV_API_KEY));
       await storage.removeItem(getUserSpecificKey(DERIV_OAUTH_TOKENS));
@@ -634,24 +634,24 @@ function HomeScreen() {
 
     // Handle OAuth callback on mobile
     if (Platform.OS !== 'web') {
-      const subscription = Linking.addEventListener('url', (event) => {
-        if (event.url.includes('dfirsttrader://oauth2/callback')) {
-          handleOAuthCallback(event.url);
-          router.replace('/(app)/home');
-        }
-      });
+    const subscription = Linking.addEventListener('url', (event) => {
+      if (event.url.includes('dfirsttrader://oauth2/callback')) {
+        handleOAuthCallback(event.url);
+        router.replace('/(app)/home');
+      }
+    });
 
-      // Check for initial URL (app opened via OAuth callback)
-      Linking.getInitialURL().then(url => {
-        if (url && url.includes('dfirsttrader://oauth2/callback')) {
-          handleOAuthCallback(url);
-          router.replace('/(app)/home');
-        }
-      });
+    // Check for initial URL (app opened via OAuth callback)
+    Linking.getInitialURL().then(url => {
+      if (url && url.includes('dfirsttrader://oauth2/callback')) {
+        handleOAuthCallback(url);
+        router.replace('/(app)/home');
+      }
+    });
 
-      return () => {
-        subscription.remove();
-      };
+    return () => {
+      subscription.remove();
+    };
     }
   }, []);
 
@@ -661,12 +661,12 @@ function HomeScreen() {
         <ThemedText style={styles.title}>DFirst Trader</ThemedText>
         <View style={styles.headerButtons}>
           {Platform.OS !== 'web' && (
-            <TouchableOpacity 
-              style={styles.logoutButton}
-              onPress={() => setShowLogoutModal(true)}
-            >
-              <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-            </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.logoutButton}
+            onPress={() => setShowLogoutModal(true)}
+          >
+            <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+          </TouchableOpacity>
           )}
           <Link href="/(app)/settings" asChild>
             <TouchableOpacity style={styles.settingsButton}>
@@ -704,7 +704,7 @@ function HomeScreen() {
 
                   <TouchableOpacity
                     style={[styles.oauthButton, styles.joinButton]}
-                    onPress={() => Linking.openURL('https://home.deriv.com/dashboard/signup?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk')}
+                    onPress={() => Linking.openURL('https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/')}
                   >
                     <ThemedText style={styles.oauthButtonText}>Create Deriv Account</ThemedText>
                   </TouchableOpacity>
