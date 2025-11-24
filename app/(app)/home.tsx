@@ -704,7 +704,7 @@ function HomeScreen() {
 
                   <TouchableOpacity
                     style={[styles.oauthButton, styles.joinButton]}
-                    onPress={() => Linking.openURL('https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/')}
+                    onPress={() => Linking.openURL('https://home.deriv.com/dashboard/signup?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk')}
                   >
                     <ThemedText style={styles.oauthButtonText}>Create Deriv Account</ThemedText>
                   </TouchableOpacity>
