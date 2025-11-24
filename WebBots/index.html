@@ -49,34 +49,33 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(1200px, 92vw);
+      width: min(520px, 92vw);
       margin: 0 auto;
-      padding: 48px 0 56px;
+      padding: 72px 0 56px;
       display: flex;
       flex-direction: column;
-      gap: 36px;
+      gap: 28px;
     }
 
-    header {
+    .connect-card {
+      background: var(--panel);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 32px;
+      box-shadow: 0 18px 45px rgba(4, 6, 12, 0.55);
       display: flex;
       flex-direction: column;
-      gap: 20px;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
+      gap: 18px;
     }
 
     .badge {
+      align-self: flex-start;
       padding: 6px 14px;
       border-radius: 999px;
       border: 1px solid var(--border);
       color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 0.04em;
+      font-size: 12px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       display: inline-flex;
       gap: 6px;
@@ -89,173 +88,94 @@
       color: var(--accent);
     }
 
-    .hero-title {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
+    .connect-card h1 {
       margin: 0;
-      font-weight: 700;
-      line-height: 1.1;
+      font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+      font-weight: 600;
+      line-height: 1.2;
     }
 
-    .hero-title span {
-      color: var(--accent);
-    }
-
-    .hero-subtitle {
-      max-width: 640px;
+    .connect-card p {
+      margin: 0;
       color: var(--muted);
-      font-size: 1rem;
       line-height: 1.6;
     }
 
-    .cta-row {
+    .actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
     }
 
-    .cta {
+    .connect-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 16px;
       border: none;
-      border-radius: 12px;
-      padding: 14px 24px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
+      justify-content: center;
       align-items: center;
       gap: 10px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      color: #0f1117;
+      text-decoration: none;
     }
 
-    .cta-primary {
+    .connect-btn.primary {
       background: linear-gradient(135deg, #00d2ff, #3a7bd5);
-      box-shadow: 0 10px 30px rgba(58, 123, 213, 0.4);
+      color: #05060c;
+      box-shadow: 0 12px 28px rgba(58, 123, 213, 0.45);
     }
 
-    .cta-secondary {
+    .connect-btn.secondary {
       background: var(--panel-strong);
       color: var(--text);
       border: 1px solid var(--border);
     }
 
-    .cta:hover {
+    .connect-btn:hover {
       transform: translateY(-2px);
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .panel {
-      background: var(--panel);
-      border-radius: 18px;
-      padding: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .panel-title {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .panel-subtitle {
-      margin: 0 0 24px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 600;
-      margin: 10px 0 0;
-    }
-
-    .chip-row {
+    .powered-by {
+      margin-top: 4px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .chart-placeholder {
-      height: 180px;
-      border-radius: 14px;
-      border: 1px dashed rgba(255,255,255,0.1);
-      background: linear-gradient(135deg, rgba(0,210,255,0.06), rgba(255,122,24,0.06));
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
+      font-size: 0.9rem;
       color: var(--muted);
-      font-size: 0.95rem;
     }
 
-    .bot-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .bot-card {
-      padding: 18px;
-      border-radius: 16px;
-      background: var(--panel-strong);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-height: 140px;
-    }
-
-    .bot-card h4 {
-      margin: 0;
-      font-size: 1rem;
+    .deriv-tag {
       font-weight: 600;
-      color: #fff;
-    }
-
-    .bot-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.4;
-      flex: 1;
-    }
-
-    .bot-card .status {
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
       color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .partner-note {
+      font-size: 0.85rem;
+      color: var(--muted);
     }
 
     footer {
       text-align: center;
       color: var(--muted);
-      font-size: 0.85rem;
-      margin-top: 20px;
+      font-size: 0.8rem;
     }
 
     @media (max-width: 640px) {
       .page {
-        width: calc(100vw - 32px);
-        padding-top: 32px;
+        padding-top: 48px;
       }
 
-      .cta-row {
-        flex-direction: column;
-        align-items: stretch;
+      .connect-card {
+        padding: 26px;
       }
     }
   </style>
@@ -263,87 +183,40 @@
 <body>
   <div class="grid-bg"></div>
   <main class="page">
-    <header>
-      <div class="badge-row">
-        <div class="badge">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 2l2.09 6.26H20l-5.17 3.76L16.18 18 12 14.77 7.82 18l1.35-5.98L4 8.26h5.91L12 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          DFirst WebBots Lab
-        </div>
-        <div class="badge">Automated MT5 &amp; MT4 Strategy Studio</div>
+    <section class="connect-card">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2l2.09 6.26H20l-5.17 3.76L16.18 18 12 14.77 7.82 18l1.35-5.98L4 8.26h5.91L12 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        DFirst WebBots
       </div>
 
-      <h1 class="hero-title">
-        Build, monitor &amp; evolve <span>next-gen bots</span> for Deriv MT4/MT5.
-      </h1>
-
-      <p class="hero-subtitle">
-        This control room will soon host our fully automated MT5 and MT4 trading systems. Design strategies, review live telemetry, and deploy cross-platform bots straight from your browser. We are finalizing integrations—stay tuned.
+      <h1>Connect your Deriv account or create one in seconds.</h1>
+      <p>
+        Securely link an existing account to start using our automated bots, or create a brand-new Deriv profile through our official partner channel. Every action routes through partner token <strong>_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk</strong> so rewards are attributed to DFirst.
       </p>
 
-      <div class="cta-row">
-        <button class="cta cta-primary">
-          <span>Launch Strategy Canvas</span>
-        </button>
-        <button class="cta cta-secondary">
-          <span>View Pipeline Roadmap</span>
-        </button>
-      </div>
-    </header>
-
-    <section class="layout">
-      <div class="panel">
-        <p class="panel-title">Realtime Telemetry</p>
-        <p class="panel-subtitle">Aggregated account vitals</p>
-        <div class="chart-placeholder">Performance visualizer coming soon</div>
+      <div class="actions">
+        <a class="connect-btn primary" href="/unlocked/app/">
+          Connect Deriv Account
+        </a>
+        <a class="connect-btn secondary" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/" target="_blank" rel="noopener">
+          Create Deriv Account (Partner Link)
+        </a>
       </div>
 
-      <div class="panel">
-        <p class="panel-title">Pipeline Stages</p>
-        <p class="panel-subtitle">Automated deployment lifecycle</p>
-        <div class="chip-row" style="margin-bottom: 18px;">
-          <span class="chip">Signal Research</span>
-          <span class="chip">Backtesting</span>
-          <span class="chip">Risk Engine</span>
-          <span class="chip">Execution Stack</span>
-          <span class="chip">Ops Monitoring</span>
-        </div>
-        <p class="panel-subtitle" style="margin-top:0;">Each phase will expose customizable controls for Deriv MT5/MT4 accounts.</p>
-      </div>
+      <p class="partner-note">
+        Tip: Once connected, you can manage bots directly inside the DFirst app or continue from this web workspace—Deriv tracks every signup and trading session under our partner program.
+      </p>
 
-      <div class="panel">
-        <p class="panel-title">Status Feed</p>
-        <p class="panel-subtitle">Next rollout ETA</p>
-        <div class="stat-value">Preparing Alpha Access</div>
-        <p class="panel-subtitle" style="margin-top:6px;">Private preview opens once automation modules are finalized.</p>
-      </div>
-    </section>
-
-    <section class="panel" style="padding:28px">
-      <p class="panel-title" style="font-size:1.1rem;">Bot Blueprints</p>
-      <p class="panel-subtitle" style="margin-bottom:24px;">Initial archetypes we are crafting before public launch.</p>
-      <div class="bot-grid">
-        <div class="bot-card">
-          <span class="status">In Concept</span>
-          <h4>Pulse Arbitrage</h4>
-          <p>Adaptive scalper that synchronizes MT4 tick velocities with Deriv volatility indices.</p>
-        </div>
-        <div class="bot-card">
-          <span class="status" style="color: var(--success);">Design Review</span>
-          <h4>Sentinel Grid</h4>
-          <p>Multi-layer martingale alternative with intelligent grid compression for MT5 synthetic pairs.</p>
-        </div>
-        <div class="bot-card">
-          <span class="status" style="color: var(--accent-2);">Research</span>
-          <h4>Neptune Macro</h4>
-          <p>Rules-based swing engine combining Deriv indices with macro momentum cues.</p>
-        </div>
+      <div class="powered-by">
+        <span>Powered by</span>
+        <span class="deriv-tag">deriv</span>
       </div>
     </section>
 
     <footer>
-      © <span id="year"></span> DFirst Automation Lab · MT4/MT5 Bots arriving soon
+      © <span id="year"></span> DFirst Automation Lab · All Deriv rights reserved
     </footer>
   </main>
 
