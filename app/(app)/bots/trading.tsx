@@ -27,6 +27,8 @@ interface BotCard {
   locked: boolean;
 }
 
+const WEB_BOTS_URL = 'https://dfirst-app.github.io/unlocked/WebBots/';
+
 const bots: BotCard[] = [
   {
     name: 'Metro Differ Bot',
@@ -576,6 +578,22 @@ function TradingScreen() {
     setShowComingSoonModal(true);
   };
 
+  const handleWebBotsPress = async () => {
+    const user = getCurrentUser();
+    if (!user) {
+      Alert.alert('Login Required', 'Please login to access this feature');
+      router.push('/');
+      return;
+    }
+
+    try {
+      await Linking.openURL(WEB_BOTS_URL);
+    } catch (error) {
+      console.error('[Trading] Failed to open WebBots:', error);
+      Alert.alert('Error', 'Unable to launch WebBots dashboard right now.');
+    }
+  };
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.container}>
@@ -599,7 +617,7 @@ function TradingScreen() {
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.actionButton, styles.platformButton]} 
-            onPress={handleComingSoonPress}
+            onPress={handleWebBotsPress}
           >
             <ThemedText style={styles.platformButtonText}>MT4/MT5 BOTS</ThemedText>
           </TouchableOpacity>

@@ -7,6 +7,9 @@ on:
     paths:
       - 'app/**'
       - 'utils/**'
+      - 'WebBots/**'
+      - 'index.html'
+      - 'download.html'
       - 'package.json'
       - 'app.json'
       - '.github/workflows/deploy-web.yml'
@@ -89,6 +92,12 @@ jobs:
             # Create .nojekyll if it doesn't exist
             touch web-build/.nojekyll
             echo "✅ Created .nojekyll in web-build root"
+          fi
+          
+          # Copy WebBots dashboard (static)
+          if [ -d "WebBots" ]; then
+            cp -r WebBots web-build/WebBots
+            echo "✅ Copied WebBots dashboard to web-build/WebBots"
           fi
           
           echo "Files moved to web-build/app/:"
