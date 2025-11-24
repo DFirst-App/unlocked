@@ -190,7 +190,7 @@ function BotScreen() {
     initialStake: bot === 'smartvolatility' ? '1' : '0.35',
     takeProfit: '0',  // Will be updated when balance is confirmed
     stopLoss: '1000',
-    martingaleMultiplier: ['safeoverbot', 'safeunderbot', 'DIFFERbot', 'metrodiffer'].includes(bot as string) ? '15' : '2.1'
+    martingaleMultiplier: ['safeoverbot', 'safeunderbot', 'DIFFERbot', 'metrodiffer'].includes(bot as string) ? '16' : '3.1'
   });
   const [stats, setStats] = useState<BotStats>({
     currentStake: 0,
@@ -1097,7 +1097,7 @@ function BotScreen() {
                     value={config.martingaleMultiplier}
                     onChangeText={(value) => setConfig({ ...config, martingaleMultiplier: value })}
                     keyboardType="decimal-pad"
-                    placeholder="2.10"
+                    placeholder="3.10"
                   />
                 </View>
               )}
