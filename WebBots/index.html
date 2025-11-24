@@ -51,20 +51,22 @@
       z-index: 1;
       width: min(420px, 92vw);
       margin: 0 auto;
-      padding: 60px 0 40px;
+      min-height: 100vh;
+      padding: 40px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 20px;
     }
 
     .card {
       width: 100%;
-      background: #ffffff;
+      background: var(--panel);
       border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 18px 40px rgba(11, 13, 16, 0.25);
-      border: 1px solid #f1f5f9;
+      padding: 26px;
+      box-shadow: 0 18px 45px rgba(4, 6, 12, 0.55);
+      border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -74,13 +76,13 @@
     .card h2 {
       margin: 0;
       font-size: 22px;
-      color: #1e293b;
+      color: var(--text);
       font-weight: 600;
     }
 
     .card p {
       margin: 0;
-      color: #64748b;
+      color: var(--muted);
       text-align: center;
       line-height: 1.5;
       font-size: 15px;
@@ -88,23 +90,24 @@
 
     .oauth-card {
       width: 100%;
-      background: #ffffff;
+      background: var(--panel-strong);
       border-radius: 16px;
-      border: 1px solid #eef2f7;
+      border: 1px solid var(--border);
       padding: 20px;
-      box-shadow: 0 8px 20px rgba(15, 17, 23, 0.07);
+      box-shadow: 0 12px 30px rgba(5, 6, 11, 0.5);
     }
 
     .oauth-card h3 {
       margin: 0 0 10px;
       font-size: 20px;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--text);
     }
 
     .oauth-card p {
       margin: 0 0 16px;
       text-align: left;
+      color: var(--muted);
     }
 
     .btn {
@@ -158,23 +161,25 @@
 
     .api-link {
       font-size: 13px;
-      color: #64748b;
-      text-decoration: underline;
+      color: var(--muted);
+      opacity: 0.6;
+      cursor: default;
     }
 
     .powered-by {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: #94a3b8;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
     }
 
     .powered-by span:last-child {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       color: #ff444f;
       text-transform: lowercase;
+      letter-spacing: 0.06em;
     }
 
     footer {
@@ -198,7 +203,7 @@
           Create Deriv Account
         </a>
       </div>
-      <a class="api-link" href="/unlocked/app/(app)/settings">Use API Key Instead</a>
+      <span class="api-link">Use API Key Instead</span>
       <div class="powered-by">
         <span>Powered by</span>
         <span>deriv</span>
