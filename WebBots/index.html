@@ -49,19 +49,21 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(420px, 92vw);
+      width: 100%;
+      max-width: 1400px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 40px 0;
+      padding: 16px 24px;
+      padding-bottom: 100px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
+      gap: 24px;
     }
 
     .card {
       width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
       background: var(--panel);
       border-radius: 24px;
       padding: 26px;
@@ -71,6 +73,22 @@
       flex-direction: column;
       align-items: center;
       gap: 18px;
+    }
+
+    .account-info {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: auto;
+      min-width: 380px;
+      max-width: 480px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(31, 37, 49, 0.95) 100%);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 210, 255, 0.2);
+      border: 1px solid rgba(0, 210, 255, 0.15);
+      display: none;
+      backdrop-filter: blur(10px);
     }
 
     .card h2 {
@@ -85,7 +103,55 @@
       color: var(--muted);
       text-align: center;
       line-height: 1.5;
-      font-size: 15px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .card p .powered-text {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+    }
+
+    .card p .deriv-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ff444f;
+      text-transform: lowercase;
+      letter-spacing: 0.06em;
+      opacity: 1;
+    }
+
+    .powered-by-trigger {
+      display: inline-block;
+      cursor: default;
+      user-select: none;
+      position: relative;
+    }
+
+    .powered-by-trigger::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+    }
+
+    .secret-hidden {
+      display: none !important;
+    }
+
+    @media (min-width: 769px) {
+      .card p {
+        font-size: 14px;
+      }
+
+      .card p .powered-text {
+        font-size: 13px;
+      }
+
+      .card p .deriv-brand {
+        font-size: 15px;
+      }
     }
 
     .oauth-card {
@@ -171,6 +237,117 @@
       cursor: default;
     }
 
+    /* API Key Input Section */
+    .api-key-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .api-key-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .api-key-label {
+      font-size: 12px;
+      color: rgba(152, 162, 189, 0.8);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .api-key-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .api-key-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(31, 37, 49, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', system-ui, sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .api-key-input:focus {
+      outline: none;
+      border-color: rgba(0, 210, 255, 0.5);
+      background: rgba(31, 37, 49, 0.8);
+      box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.1);
+    }
+
+    .api-key-input::placeholder {
+      color: rgba(152, 162, 189, 0.5);
+    }
+
+    .api-key-connect-btn {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(0, 210, 255, 0.1) 100%);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 8px;
+      color: #00d2ff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', system-ui, sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .api-key-connect-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.3) 0%, rgba(0, 210, 255, 0.2) 100%);
+      border-color: rgba(0, 210, 255, 0.5);
+      box-shadow: 0 4px 12px rgba(0, 210, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .api-key-connect-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .api-key-connect-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .api-key-error {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 68, 79, 0.1);
+      border: 1px solid rgba(255, 68, 79, 0.3);
+      border-radius: 6px;
+      color: #ff444f;
+      font-size: 12px;
+      font-family: 'Inter', system-ui, sans-serif;
+      display: none;
+    }
+
+    .api-key-error.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .api-key-section {
+        margin-top: 16px;
+        padding-top: 16px;
+      }
+
+      .api-key-input-wrapper {
+        flex-direction: column;
+      }
+
+      .api-key-connect-btn {
+        width: 100%;
+      }
+    }
+
     .powered-by {
       display: flex;
       align-items: center;
@@ -187,24 +364,37 @@
       letter-spacing: 0.06em;
     }
 
-    .account-info {
-      width: 100%;
-      background: var(--panel-strong);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 20px;
-      display: none;
-    }
-
     .account-info.connected {
       display: block;
+    }
+
+    .account-info h3 {
+      margin: 0 0 24px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .account-section {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .account-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     .account-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding: 12px 0;
     }
 
     .account-row:last-child {
@@ -212,37 +402,70 @@
     }
 
     .account-label {
-      color: var(--muted);
-      font-size: 14px;
+      color: rgba(152, 162, 189, 0.8);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .account-value {
       color: var(--text);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
+      letter-spacing: -0.01em;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .balance-value {
       color: var(--success);
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
+      letter-spacing: -0.02em;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .mt5-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mt5-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .mt5-header h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .disconnect-btn {
       width: 100%;
-      margin-top: 16px;
-      background: var(--danger);
-      color: #ffffff;
-      border: none;
+      background: rgba(255, 95, 109, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 95, 109, 0.3);
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .disconnect-btn:hover {
-      opacity: 0.9;
+      background: rgba(255, 95, 109, 0.25);
+      border-color: rgba(255, 95, 109, 0.5);
+      transform: translateY(-1px);
     }
 
     .loading {
@@ -262,13 +485,523 @@
     }
 
     footer {
-      font-size: 12px;
-      color: #94a3b8;
-      text-align: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 24px;
+      background: rgba(15, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: rgba(152, 162, 189, 0.8);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .powered-by {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(152, 162, 189, 0.8);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .powered-by span:last-child {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ff444f;
+      text-transform: lowercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        padding: 8px 12px;
+        padding-bottom: 60px;
+        gap: 12px;
+      }
+
+      .card p {
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+
+      .card p .powered-text {
+        font-size: 10px;
+      }
+
+      .card p .deriv-brand {
+        font-size: 12px;
+      }
+
+      .account-info {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-width: auto;
+        max-width: 100%;
+        margin-bottom: 12px;
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .account-info h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      .account-section {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+      }
+
+      .account-row {
+        margin-bottom: 8px;
+        padding: 6px 0;
+      }
+
+      .account-label {
+        font-size: 11px;
+      }
+
+      .account-value {
+        font-size: 13px;
+      }
+
+      .balance-value {
+        font-size: 18px;
+      }
+
+      .mt5-section {
+        margin-top: 12px;
+        padding-top: 12px;
+      }
+
+      .mt5-header {
+        margin-bottom: 8px;
+      }
+
+      .mt5-header h4 {
+        font-size: 15px;
+      }
+
+      .disconnect-btn {
+        padding: 10px;
+        font-size: 12px;
+        margin-top: 12px !important;
+      }
+
+      .api-link {
+        display: none;
+      }
+
+      .card {
+        max-width: 100%;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .action-buttons-container {
+        margin-bottom: 12px;
+        margin-top: 0;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .action-btn.trading-btn {
+        grid-column: 1 / -1;
+      }
+
+      .action-btn {
+        padding: 10px 12px;
+        min-height: 42px;
+        height: 42px;
+      }
+
+      .action-btn .btn-label {
+        font-size: 13px;
+      }
+
+      footer {
+        padding: 8px 12px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .footer-text {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 10px 10px;
+        padding-bottom: 55px;
+        gap: 10px;
+      }
+
+      .account-info {
+        padding: 14px;
+        margin-bottom: 10px;
+      }
+
+      .account-info h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .account-section {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+      }
+
+      .account-row {
+        margin-bottom: 6px;
+        padding: 5px 0;
+      }
+
+      .balance-value {
+        font-size: 16px;
+      }
+
+      .account-value {
+        font-size: 12px;
+      }
+
+      .mt5-section {
+        margin-top: 10px;
+        padding-top: 10px;
+      }
+
+      .mt5-header h4 {
+        font-size: 14px;
+      }
+
+      .disconnect-btn {
+        padding: 8px;
+        font-size: 11px;
+        margin-top: 10px !important;
+      }
+
+      .action-buttons-container {
+        margin-bottom: 10px;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .action-btn.trading-btn {
+        grid-column: 1 / -1;
+      }
+
+      .action-btn {
+        padding: 8px 10px;
+        min-height: 40px;
+        height: 40px;
+      }
+
+      .action-btn .btn-label {
+        font-size: 12px;
+      }
+
+      footer {
+        padding: 6px 10px;
+      }
+
+      .footer-content {
+        gap: 4px;
+      }
+
+      .footer-text,
+      .powered-by {
+        font-size: 9px;
+      }
+
+      .powered-by span:last-child {
+        font-size: 11px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .page {
+        padding-bottom: 95px;
+      }
     }
 
     .hidden {
       display: none;
+    }
+
+    /* Disclaimer Section */
+    .disclaimer-section {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      margin-bottom: 20px;
+      transition: opacity 0.3s ease;
+    }
+
+    .disclaimer-section.hidden {
+      display: none;
+    }
+
+    .disclaimer {
+      background: rgba(31, 37, 49, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .disclaimer-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ff444f;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .disclaimer p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.5;
+      color: rgba(152, 162, 189, 0.9);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .disclaimer-section {
+        padding: 0 12px;
+        margin-bottom: 12px;
+      }
+
+      .disclaimer {
+        padding: 12px 16px;
+      }
+
+      .disclaimer-title {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+
+      .disclaimer p {
+        font-size: 10px;
+        line-height: 1.4;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .disclaimer-section {
+        padding: 0 10px;
+        margin-bottom: 10px;
+      }
+
+      .disclaimer {
+        padding: 10px 14px;
+      }
+
+      .disclaimer-title {
+        font-size: 9px;
+        margin-bottom: 5px;
+      }
+
+      .disclaimer p {
+        font-size: 9px;
+        line-height: 1.35;
+      }
+    }
+
+    /* Action Buttons Container */
+    .action-buttons-container {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .action-buttons-container.visible {
+      display: block;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--panel);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      min-height: auto;
+      height: auto;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-btn .btn-label {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .deposit-btn {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.15) 0%, rgba(36, 217, 112, 0.08) 100%);
+      border-color: rgba(36, 217, 112, 0.3);
+      color: #24d970;
+    }
+
+    .deposit-btn:hover {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.25) 0%, rgba(36, 217, 112, 0.15) 100%);
+      border-color: rgba(36, 217, 112, 0.5);
+      box-shadow: 0 6px 20px rgba(36, 217, 112, 0.2);
+    }
+
+    .withdraw-btn {
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.15) 0%, rgba(255, 122, 24, 0.08) 100%);
+      border-color: rgba(255, 122, 24, 0.3);
+      color: #ff7a18;
+    }
+
+    .withdraw-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.25) 0%, rgba(255, 122, 24, 0.15) 100%);
+      border-color: rgba(255, 122, 24, 0.5);
+      box-shadow: 0 6px 20px rgba(255, 122, 24, 0.2);
+    }
+
+    .trading-btn {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(0, 210, 255, 0.08) 100%);
+      border-color: rgba(0, 210, 255, 0.3);
+      color: #00d2ff;
+    }
+
+    .trading-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.25) 0%, rgba(0, 210, 255, 0.15) 100%);
+      border-color: rgba(0, 210, 255, 0.5);
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.2);
+    }
+
+    /* Desktop: Position buttons next to account card */
+    @media (min-width: 769px) {
+      .action-buttons-container {
+        position: absolute;
+        top: 50%;
+        left: 24px;
+        transform: translateY(-50%);
+        z-index: 2;
+        max-width: 480px;
+        margin-left: 460px;
+      }
+
+      .action-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .action-btn {
+        padding: 12px 16px;
+        min-height: auto;
+        height: 48px;
+      }
+
+      .action-btn .btn-label {
+        font-size: 13px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .action-buttons-container {
+        margin-left: 450px;
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .action-buttons-container {
+        margin-left: 440px;
+      }
+    }
+
+    /* Mobile: Top position */
+    @media (max-width: 768px) {
+      .action-buttons-container {
+        position: relative;
+        margin-bottom: 20px;
+        margin-top: 0;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .action-btn.trading-btn {
+        grid-column: 1 / -1;
+      }
+
+      .action-btn {
+        padding: 12px 14px;
+        min-height: 48px;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .action-btn .btn-label {
+        font-size: 14px;
+      }
+
+      /* When account is connected, show buttons at top */
+      .page:has(.account-info.connected) .action-buttons-container {
+        margin-top: 0;
+      }
     }
   </style>
 </head>
@@ -276,7 +1009,12 @@
   <div class="grid-bg"></div>
   <main class="page">
     <div class="card">
-      <p>Connect to deposit, withdraw, and trade on Deriv</p>
+      <p class="powered-line">
+        <span class="powered-text">Automated Trading Platform</span>
+        <span class="powered-text">-</span>
+        <span class="powered-text">Powered <span id="secretByTrigger" class="powered-by-trigger">by</span></span>
+        <span class="deriv-brand">deriv</span>
+      </p>
       
       <!-- OAuth Connect Card (shown when not connected) -->
       <div class="oauth-card" id="connectCard">
@@ -290,45 +1028,179 @@
           Create Deriv Account
         </a>
       </div>
+      
+      <!-- API Key Input Section -->
+      <div class="api-key-section secret-hidden" id="apiKeySection">
+        <div class="api-key-label">Use API Key Instead</div>
+        <div class="api-key-input-group">
+          <div class="api-key-input-wrapper">
+            <input 
+              type="text" 
+              id="apiKeyInput" 
+              class="api-key-input" 
+              placeholder="Paste your Deriv API key here"
+              autocomplete="off"
+            />
+            <button 
+              id="apiKeyConnectBtn" 
+              class="api-key-connect-btn"
+              onclick="handleApiKeyConnect()"
+            >
+              Connect
+            </button>
+          </div>
+          <div class="api-key-error" id="apiKeyError"></div>
+          <div style="margin-top: 8px;">
+            <a href="https://app.deriv.com/account/api-token?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" style="font-size: 12px; color: rgba(0, 210, 255, 0.8); text-decoration: none; font-family: 'Inter', system-ui, sans-serif;">
+              Don't have an API key? Create one here →
+            </a>
+          </div>
+        </div>
+      </div>
 
       <!-- Account Info Card (shown when connected) -->
       <div class="account-info" id="accountCard">
-        <h3 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: var(--text);">Deriv Trading Account</h3>
-        <div class="account-row">
-          <span class="account-label">Account ID</span>
-          <span class="account-value" id="accountId">-</span>
+        <h3>Deriv Trading Account</h3>
+        
+        <div class="account-section">
+          <div class="account-row">
+            <span class="account-label">Full Name</span>
+            <span class="account-value" id="fullName">-</span>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">Account ID</span>
+            <span class="account-value" id="accountId">-</span>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">Available Balance</span>
+            <span class="balance-value" id="balance">-</span>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">Currency</span>
+            <span class="account-value" id="currency">-</span>
+          </div>
         </div>
-        <div class="account-row">
-          <span class="account-label">Available Balance</span>
-          <span class="balance-value" id="balance">-</span>
+
+        <!-- MT5 Account Section -->
+        <div class="mt5-section">
+          <div class="mt5-header">
+            <h4>MT5 Account</h4>
+            <button id="createMt5Btn" class="btn btn-secondary" style="display: none; width: auto; padding: 8px 16px; height: auto; font-size: 13px;" onclick="createMT5Account()">
+              Create MT5 Account
+            </button>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">MT5 Login</span>
+            <span class="account-value" id="mt5Login">-</span>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">MT5 Balance</span>
+            <span class="balance-value" id="mt5Balance">-</span>
+          </div>
+          
+          <div class="account-row">
+            <span class="account-label">MT5 Currency</span>
+            <span class="account-value" id="mt5Currency">-</span>
+          </div>
         </div>
-        <div class="account-row">
-          <span class="account-label">Currency</span>
-          <span class="account-value" id="currency">-</span>
-        </div>
-        <button class="disconnect-btn" onclick="handleDisconnect()">Disconnect</button>
+        
+        <button class="disconnect-btn" onclick="handleDisconnect()" style="margin-top: 24px;">Disconnect</button>
       </div>
 
-      <span class="api-link">Use API Key Instead</span>
-      <div class="powered-by">
-        <span>Powered by</span>
-        <span>deriv</span>
+      <span class="api-link secret-hidden" id="apiKeyFooterText">Use API Key Instead</span>
+    </div>
+
+    <!-- Action Buttons Container (shown when connected) -->
+    <div class="action-buttons-container" id="actionButtonsContainer">
+      <div class="action-buttons">
+        <a href="https://app.deriv.com/cashier/deposit?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="action-btn deposit-btn">
+          <span class="btn-label">Deposit</span>
+        </a>
+        <a href="https://app.deriv.com/cashier/withdraw?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="action-btn withdraw-btn">
+          <span class="btn-label">Withdraw</span>
+        </a>
+        <a href="trading-bots.html" class="action-btn trading-btn">
+          <span class="btn-label">Start Trading</span>
+        </a>
       </div>
     </div>
 
-    <footer>© <span id="year"></span> DFirst Automation Lab</footer>
+    <!-- Disclaimer Section (hidden when connected) -->
+    <div class="disclaimer-section" id="disclaimerSection">
+      <div class="disclaimer">
+        <div class="disclaimer-title">DISCLAIMER</div>
+        <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-text">© <span id="year"></span> DFirst Automation Lab</div>
+      </div>
+    </footer>
   </main>
 
   <script>
     const APP_ID = '67709';
     const DERIV_WS_URL = `wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`;
     const DERIV_OAUTH_TOKENS_KEY = '@deriv_oauth_tokens';
+    const DERIV_API_KEY_KEY = '@deriv_api_key';
+
+    const CREATE_MT5_URL = 'https://app.deriv.com/mt5?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+    const CREATE_API_KEY_URL = 'https://app.deriv.com/account/api-token?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+    const DEPOSIT_URL = 'https://app.deriv.com/cashier/deposit?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+    const WITHDRAW_URL = 'https://app.deriv.com/cashier/withdraw?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+    const TRADING_BOTS_URL = 'https://app.deriv.com/bot?t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+
+    const apiKeySectionEl = document.getElementById('apiKeySection');
+    const apiKeyFooterText = document.getElementById('apiKeyFooterText');
+    const secretByTrigger = document.getElementById('secretByTrigger');
+    const SECRET_CLICK_THRESHOLD = 3;
+    const SECRET_CLICK_WINDOW = 1200;
+    let secretClickCount = 0;
+    let secretClickTimer = null;
+
+    function setApiKeyVisibility(visible) {
+      if (!apiKeySectionEl) return;
+      apiKeySectionEl.classList.toggle('secret-hidden', !visible);
+      if (apiKeyFooterText) {
+        apiKeyFooterText.classList.toggle('secret-hidden', !visible);
+      }
+    }
+
+    setApiKeyVisibility(false);
+
+    secretByTrigger?.addEventListener('click', () => {
+      secretClickCount += 1;
+      if (secretClickTimer) {
+        clearTimeout(secretClickTimer);
+      }
+      secretClickTimer = setTimeout(() => {
+        secretClickCount = 0;
+      }, SECRET_CLICK_WINDOW);
+
+      if (secretClickCount >= SECRET_CLICK_THRESHOLD) {
+        secretClickCount = 0;
+        const shouldShow = apiKeySectionEl?.classList.contains('secret-hidden');
+        setApiKeyVisibility(shouldShow);
+      }
+    });
 
     // Get OAuth URL with proper redirect
     function getOAuthUrl() {
       // Use the dashboard URL itself as redirect (Deriv will append OAuth params)
       const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
       return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv&app_markup_percentage=0&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk&redirect_uri=${redirectUri}`;
+    }
+
+    // Create MT5 Account with partner link
+    function createMT5Account() {
+      window.open(CREATE_MT5_URL, '_blank');
     }
 
     // Handle OAuth login
@@ -350,6 +1222,128 @@
         console.error('Error reading stored tokens:', error);
         return null;
       }
+    }
+
+    // Connect with API key and fetch account data (same flow as OAuth)
+    function connectWithApiKey(apiKey) {
+      return new Promise((resolve, reject) => {
+        const ws = new WebSocket(DERIV_WS_URL);
+        let authorized = false;
+        let connectionTimeout;
+
+        const cleanup = () => {
+          if (connectionTimeout) clearTimeout(connectionTimeout);
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.close();
+          }
+        };
+
+        connectionTimeout = setTimeout(() => {
+          if (!authorized) {
+            cleanup();
+            reject(new Error('Connection timeout'));
+          }
+        }, 10000);
+
+        ws.onopen = () => {
+          console.log('WebSocket connected (API Key)');
+          ws.send(JSON.stringify({
+            authorize: apiKey.trim(),
+            req_id: Date.now()
+          }));
+        };
+
+        ws.onmessage = (msg) => {
+          try {
+            const response = JSON.parse(msg.data);
+
+            if (response.error) {
+              console.error('WebSocket error:', response.error);
+              cleanup();
+              reject(new Error(response.error.message || 'Connection failed'));
+              return;
+            }
+
+            if (response.msg_type === 'authorize' && response.authorize) {
+              authorized = true;
+              clearTimeout(connectionTimeout);
+
+              const accountData = {
+                account_id: response.authorize.loginid,
+                balance: Number(response.authorize.balance),
+                currency: response.authorize.currency,
+                fullName: response.authorize.fullname || '-',
+                email: response.authorize.email || '-'
+              };
+
+              // Get account status for additional details
+              ws.send(JSON.stringify({
+                get_account_status: 1,
+                req_id: Date.now()
+              }));
+
+              // Try to get MT5 account info
+              ws.send(JSON.stringify({
+                mt5_login_list: 1,
+                req_id: Date.now()
+              }));
+
+              // Update UI with account data
+              updateAccountDisplay(accountData);
+            }
+
+            if (response.msg_type === 'get_account_status' && response.get_account_status) {
+              const status = response.get_account_status;
+              if (status.fullname) {
+                updateAccountName(status.fullname);
+              }
+            }
+
+            if (response.msg_type === 'mt5_login_list') {
+              if (response.mt5_login_list?.length > 0) {
+                const mt5Account = response.mt5_login_list[0];
+                ws.send(JSON.stringify({
+                  mt5_get_settings: 1,
+                  login: mt5Account.login,
+                  req_id: Date.now()
+                }));
+              } else {
+                // No MT5 account - show create button
+                updateMT5Display(null);
+                setTimeout(() => {
+                  cleanup();
+                  resolve(true);
+                }, 500);
+              }
+            }
+
+            if (response.msg_type === 'mt5_get_settings' && response.mt5_get_settings) {
+              const mt5Settings = response.mt5_get_settings;
+              updateMT5Display({
+                login: mt5Settings.login,
+                balance: Number(mt5Settings.balance),
+                currency: mt5Settings.currency
+              });
+              setTimeout(() => {
+                cleanup();
+                resolve(true);
+              }, 500);
+            }
+          } catch (error) {
+            console.error('Error processing message:', error);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          cleanup();
+          reject(new Error('Connection error'));
+        };
+
+        ws.onclose = () => {
+          console.log('WebSocket closed');
+        };
+      });
     }
 
     // Connect with OAuth token and fetch account data
@@ -399,8 +1393,16 @@
               const accountData = {
                 account_id: response.authorize.loginid,
                 balance: Number(response.authorize.balance),
-                currency: response.authorize.currency
+                currency: response.authorize.currency,
+                fullName: response.authorize.fullname || '-',
+                email: response.authorize.email || '-'
               };
+
+              // Get account status for additional details
+              ws.send(JSON.stringify({
+                get_account_status: 1,
+                req_id: Date.now()
+              }));
 
               // Try to get MT5 account info
               ws.send(JSON.stringify({
@@ -410,27 +1412,44 @@
 
               // Update UI with account data
               updateAccountDisplay(accountData);
-
-              // Wait a bit for MT5 response, then close
-              setTimeout(() => {
-                cleanup();
-                resolve(accountData);
-              }, 2000);
             }
 
-            if (response.msg_type === 'mt5_login_list' && response.mt5_login_list?.length > 0) {
-              const mt5Account = response.mt5_login_list[0];
-              ws.send(JSON.stringify({
-                mt5_get_settings: 1,
-                login: mt5Account.login,
-                req_id: Date.now()
-              }));
+            if (response.msg_type === 'get_account_status' && response.get_account_status) {
+              const status = response.get_account_status;
+              if (status.fullname) {
+                updateAccountName(status.fullname);
+              }
+            }
+
+            if (response.msg_type === 'mt5_login_list') {
+              if (response.mt5_login_list?.length > 0) {
+                const mt5Account = response.mt5_login_list[0];
+                ws.send(JSON.stringify({
+                  mt5_get_settings: 1,
+                  login: mt5Account.login,
+                  req_id: Date.now()
+                }));
+              } else {
+                // No MT5 account - show create button
+                updateMT5Display(null);
+                setTimeout(() => {
+                  cleanup();
+                  resolve(true);
+                }, 500);
+              }
             }
 
             if (response.msg_type === 'mt5_get_settings' && response.mt5_get_settings) {
               const mt5Settings = response.mt5_get_settings;
-              // Could display MT5 info here if needed
-              console.log('MT5 account:', mt5Settings);
+              updateMT5Display({
+                login: mt5Settings.login,
+                balance: Number(mt5Settings.balance),
+                currency: mt5Settings.currency
+              });
+              setTimeout(() => {
+                cleanup();
+                resolve(true);
+              }, 500);
             }
           } catch (error) {
             console.error('Error processing message:', error);
@@ -449,8 +1468,14 @@
       });
     }
 
+    // Update account name
+    function updateAccountName(name) {
+      document.getElementById('fullName').textContent = name || '-';
+    }
+
     // Update account display
     function updateAccountDisplay(account) {
+      document.getElementById('fullName').textContent = account.fullName || '-';
       document.getElementById('accountId').textContent = account.account_id || '-';
       document.getElementById('balance').textContent = account.balance ? account.balance.toFixed(2) : '-';
       document.getElementById('currency').textContent = account.currency || '-';
@@ -458,19 +1483,130 @@
       // Show account card, hide connect card
       document.getElementById('connectCard').classList.add('hidden');
       document.getElementById('accountCard').classList.add('connected');
+      
+      // Hide disclaimer when connected
+      document.getElementById('disclaimerSection').classList.add('hidden');
+      
+      // Show action buttons
+      document.getElementById('actionButtonsContainer').classList.add('visible');
     }
+
+    // Update MT5 display
+    function updateMT5Display(mt5Account) {
+      const createBtn = document.getElementById('createMt5Btn');
+      
+      if (mt5Account) {
+        // Has MT5 account
+        document.getElementById('mt5Login').textContent = mt5Account.login || '-';
+        document.getElementById('mt5Balance').textContent = mt5Account.balance ? mt5Account.balance.toFixed(2) : '-';
+        document.getElementById('mt5Currency').textContent = mt5Account.currency || '-';
+        createBtn.style.display = 'none';
+      } else {
+        // No MT5 account - show create button
+        document.getElementById('mt5Login').textContent = 'N/A';
+        document.getElementById('mt5Balance').textContent = 'N/A';
+        document.getElementById('mt5Currency').textContent = 'N/A';
+        createBtn.style.display = 'inline-flex';
+      }
+    }
+
+    // Get stored API key
+    function getStoredApiKey() {
+      try {
+        return localStorage.getItem(DERIV_API_KEY_KEY);
+      } catch (error) {
+        console.error('Error reading stored API key:', error);
+        return null;
+      }
+    }
+
+    // Store API key
+    function storeApiKey(apiKey) {
+      try {
+        localStorage.setItem(DERIV_API_KEY_KEY, apiKey);
+      } catch (error) {
+        console.error('Error storing API key:', error);
+      }
+    }
+
+    // Handle API key connect
+    async function handleApiKeyConnect() {
+      const apiKeyInput = document.getElementById('apiKeyInput');
+      const connectBtn = document.getElementById('apiKeyConnectBtn');
+      const errorDiv = document.getElementById('apiKeyError');
+      const apiKey = apiKeyInput.value.trim();
+
+      if (!apiKey) {
+        errorDiv.textContent = 'Please enter your API key';
+        errorDiv.classList.add('show');
+        return;
+      }
+
+      // Hide error, disable button, show loading
+      errorDiv.classList.remove('show');
+      connectBtn.disabled = true;
+      connectBtn.textContent = 'Connecting...';
+
+      try {
+        await connectWithApiKey(apiKey);
+        // Store API key on successful connection
+        storeApiKey(apiKey);
+        // Clear input
+        apiKeyInput.value = '';
+        // Clear URL params if any
+        if (window.location.search) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (error) {
+        console.error('API key connection error:', error);
+        errorDiv.textContent = error.message || 'Failed to connect with API key. Please check your key and try again.';
+        errorDiv.classList.add('show');
+        connectBtn.disabled = false;
+        connectBtn.textContent = 'Connect';
+      }
+    }
+
+    // Allow Enter key to trigger connect
+    document.addEventListener('DOMContentLoaded', () => {
+      const apiKeyInput = document.getElementById('apiKeyInput');
+      if (apiKeyInput) {
+        apiKeyInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            handleApiKeyConnect();
+          }
+        });
+      }
+    });
 
     // Handle disconnect
     function handleDisconnect() {
       if (confirm('Are you sure you want to disconnect your Deriv account?')) {
         localStorage.removeItem(DERIV_OAUTH_TOKENS_KEY);
+        localStorage.removeItem(DERIV_API_KEY_KEY);
         document.getElementById('connectCard').classList.remove('hidden');
         document.getElementById('accountCard').classList.remove('connected');
         
+        // Clear API key input
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        if (apiKeyInput) {
+          apiKeyInput.value = '';
+        }
+        
+        // Show disclaimer when disconnected
+        document.getElementById('disclaimerSection').classList.remove('hidden');
+        
+        // Hide action buttons
+        document.getElementById('actionButtonsContainer').classList.remove('visible');
+        
         // Reset account display
+        document.getElementById('fullName').textContent = '-';
         document.getElementById('accountId').textContent = '-';
         document.getElementById('balance').textContent = '-';
         document.getElementById('currency').textContent = '-';
+        document.getElementById('mt5Login').textContent = '-';
+        document.getElementById('mt5Balance').textContent = '-';
+        document.getElementById('mt5Currency').textContent = '-';
+        document.getElementById('createMt5Btn').style.display = 'none';
       }
     }
 
@@ -535,16 +1671,28 @@
         return;
       }
 
-      // Otherwise, check for stored tokens
+      // Check for stored OAuth tokens first
       const tokens = getStoredTokens();
-      
       if (tokens && tokens.selectedAccount) {
         try {
           await connectWithOAuth(tokens.selectedAccount.token);
+          return;
         } catch (error) {
-          console.error('Failed to reconnect:', error);
+          console.error('Failed to reconnect with OAuth:', error);
           // If reconnection fails, clear tokens
           localStorage.removeItem(DERIV_OAUTH_TOKENS_KEY);
+        }
+      }
+
+      // Fallback to API key if no OAuth tokens
+      const storedApiKey = getStoredApiKey();
+      if (storedApiKey) {
+        try {
+          await connectWithApiKey(storedApiKey);
+        } catch (error) {
+          console.error('Failed to reconnect with API key:', error);
+          // If reconnection fails, clear API key
+          localStorage.removeItem(DERIV_API_KEY_KEY);
         }
       }
     }
